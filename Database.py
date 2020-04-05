@@ -40,10 +40,16 @@ class Database:
                             raise FormatError(self.DATABASE_ERROR + str(address) + ' is missing "' + str(char) + '"')
                     # Check attribute names
                     self._attribute_check(['password', 'question', 'linkto', 'notes'], values)
+                    # Check password is not empty
+                    if not values['password']:
+                        raise FormatError(self.DATABASE_ERROR + str(address) + ' has empty password')
                     # Check that linkto points to an existing record
                     if values['linkto']:
                         for link in values['linkto']:
                             self._linkto_check(data, link, address)
+
+            # Check website section
+
 
     def _linkto_check(self, data, node: str, source: str) -> None:
         """
