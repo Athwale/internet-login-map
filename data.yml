@@ -1,62 +1,62 @@
 ---
 # E-mail records
-- emails:
-    - white@gmail.com:
-        password: 'xxxpassword'
-        question: '42'
-        linkto:
-          - 'bear@gmail.com'
-        notes: 'More info'
+emails:
+  - white@gmail.com:
+      password: 'xxxpassword'
+      question: '42'
+      linkto:
+        - 'bear@gmail.com'
+      notes: 'More info'
 
-    - bear@gmail.com:
-        password: 'xxxpassword1'
-        question: 'answer'
-        linkto: ~
-        notes: ~
+  - bear@gmail.com:
+      password: 'xxxpassword1'
+      question: 'answer'
+      linkto: ~
+      notes: ~
 
 # Website records
-- websites:
-    - www.seznam.cz:
-        login: 'white'
-        password: 'testpass'
-        email:
-          - 'white@gmail.com'
-          - 'bear@gmail.com'
-        question: 'medved'
-        linkto: ~
-        notes: 'Additional notes'
+websites:
+  - www.seznam.cz:
+      login: 'white'
+      password: 'testpass'
+      email:
+        - 'white@gmail.com'
+        - 'bear@gmail.com'
+      question: 'medved'
+      linkto: ~
+      notes: 'Additional notes'
 
-    - www.forum.com:
-        login: 'athwale'
-        password: 'testpass1'
-        email:
-          - 'white@gmail.com'
-        question: 'arctic'
-        linkto:
-          - 'www.seznam.cz'
-        notes: ~
+  - www.forum.com:
+      login: 'athwale'
+      password: 'testpass1'
+      email:
+        - 'white@gmail.com'
+      question: 'arctic'
+      linkto:
+        - 'www.seznam.cz'
+      notes: ~
 
-    - www.forum.com:
-        login: 'polar'
-        password: 'bear'
-        email:
-          - 'mail3@volny.cz'
-        question: 'response'
-        linkto: ~
-        notes: 'More notes'
+  - www.forum.com:
+      login: 'polar'
+      password: 'bear'
+      email:
+        - 'mail3@volny.cz'
+      question: 'response'
+      linkto: ~
+      notes: 'More notes'
 
 # Company records
-- companies:
-    - XYZComp:
-        email:
-          - 'white@gmail.com'
-        linkto:
-          - 'www.seznam.cz'
-          - 'www.github.com'
-          - 'www.white-bear.cz'
+companies:
+  - XYZComp:
+      email:
+        - 'white@gmail.com'
+      linkto:
+        - 'www.seznam.cz'
+        - 'www.github.com'
+        - 'www.white-bear.cz'
 
-    - WHITE-BEAR:
-        email:
-          - 'bear@gmail.com'
-        linkto: ~
+  - WHITE-BEAR:
+      email:
+        - 'bear@gmail.com'
+      linkto: ~
 ...
