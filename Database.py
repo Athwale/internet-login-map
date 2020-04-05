@@ -41,20 +41,25 @@ class Database:
                     # Check attribute names
                     self._attribute_check(['password', 'question', 'linkto', 'notes'], values)
                     # Check that linkto points to an existing record
-                    self._linkto_check(values, 'linkto')
+                    if values['linkto']:
+                        for link in values['linkto']:
+                            self._linkto_check(data, link, address)
 
-    def _linkto_check(self, attr_dict, kind: str) -> None:
+    def _linkto_check(self, data, node: str, source: str) -> None:
         """
-        Check that linkto from record attributes points to an existing record in database.
-        :param attr_dict: Record attributes from yaml. Like email data.
-        :param kind: str one of 'mail' and 'linkto'
+        Check that node exists in the database. This is used to check that linkto and email point to an existing record
+        in the database.
+        :param data: Loaded yaml database.
+        :param node: str, The name of the node we are checking for existence.
+        :param source: str, The name of the node where the node was found.
         :return: None
-        :exception FormatError if link does not lead to an existing record.
+        :exception FormatError if the node does not exist in the database.
         """
-        if attr_dict[kind]:
-            for link in attr_dict[kind]:
-                print(link)
-
+        for _, values in data.items():
+            for record in values:
+                if list(record)[0] == node:
+                    return
+        raise FormatError(self.DATABASE_ERROR + str(source) + ' points to invalid record ' + str(node))
 
     def _attribute_check(self, valid_list, attr_dict) -> None:
         """
