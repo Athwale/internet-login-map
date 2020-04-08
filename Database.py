@@ -1,3 +1,5 @@
+from typing import List
+
 import yaml
 
 from FormatError import FormatError
@@ -5,7 +7,7 @@ from FormatError import FormatError
 
 class Database:
     """
-
+    This class works with the yaml database. Performs add, remove, change, find and validation.
     """
 
     DATABASE_ERROR = 'Database format error, '
@@ -16,12 +18,11 @@ class Database:
         :param file: str, database file name.
         """
         self._database_file = file
-        self._validate()
 
-    def _validate(self):
+    def validate(self) -> bool:
         """
         Check database file for errors.
-        :return:
+        :return: bool True if validation passed, exception FormatError is thrown otherwise.
         """
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
@@ -93,13 +94,14 @@ class Database:
                     # Check that each linkto point to an existing record
                     if values['linkto']:
                         self._linkto_check(data, values['linkto'], web_address)
+        return True
 
-    def _linkto_check(self, data, links, source: str) -> None:
+    def _linkto_check(self, data, links: List[str], source: str) -> None:
         """
         Check that node exists in the database. This is used to check that linkto and email point to an existing record
         in the database. Also check that links and emails are not duplicated.
         :param data: Loaded yaml database.
-        :param links: List of links/emails of the given website or company or email
+        :param links: List of str links/emails of the given website or company or email
         :param source: str, The name of the node where the node was found.
         :return: None
         :exception FormatError if the node does not exist in the database.
@@ -116,7 +118,7 @@ class Database:
             if links.count(link) > 1:
                 raise FormatError(self.DATABASE_ERROR + str(source) + ' contains duplicates of ' + str(link))
 
-    def _attribute_check(self, valid_list, attr_dict, source) -> None:
+    def _attribute_check(self, valid_list: List[str], attr_dict, source: str) -> None:
         """
         Check that keys in attr_dict only have names listed in valid_list.
         :param valid_list: List of allowed string key names (attributes in yaml)
@@ -133,3 +135,11 @@ class Database:
         if list(attr_dict) != valid_list:
             extra = set(attr_dict).difference(set(valid_list))
             raise FormatError(self.DATABASE_ERROR + str(source) + ' has extra attribute/s: ' + str(extra))
+
+    def find(self, string: str):
+        """
+        Find records in database that contain the string. Go through all records and look for the string.
+        :param string: The strings that the record must contain.
+        :return: A list of yaml records.
+        """
+        pass
