@@ -48,8 +48,7 @@ class Database:
                         raise FormatError(self.DATABASE_ERROR + str(address) + ' has empty password')
                     # Check that linkto points to an existing record
                     if values['linkto']:
-                        for link in values['linkto']:
-                            self._linkto_check(data, link, address)
+                        self._linkto_check(data, values['linkto'], address)
 
             # Check website section
             # Check that website begins with www and contains a dot. Check that each website record has required
@@ -74,34 +73,48 @@ class Database:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' has empty password')
                     # Check that emails point to an existing record
                     if values['email']:
-                        for email in values['email']:
-                            self._linkto_check(data, email, web_address)
+                        self._linkto_check(data, values['email'], web_address)
                     # Check that each linkto point to an existing record
                     if values['linkto']:
-                        for link in values['linkto']:
-                            self._linkto_check(data, link, web_address)
+                        self._linkto_check(data, values['linkto'], web_address)
 
             # Check company section
             # Check that each company record has required attributes. Check that each linkto/email attribute points to
             # an existing record.
             for company in data['companies']:
-                print(company)
+                if len(company.keys()) > 1:
+                    raise FormatError(self.DATABASE_ERROR + str(company) + ' record is malformed')
+                for company_name, values in company.items():
+                    # Check attribute names
+                    self._attribute_check(['email', 'linkto', 'notes'], values, company_name)
+                    # Check that emails point to an existing record
+                    if values['email']:
+                        self._linkto_check(data, values['email'], web_address)
+                    # Check that each linkto point to an existing record
+                    if values['linkto']:
+                        self._linkto_check(data, values['linkto'], web_address)
 
-    def _linkto_check(self, data, node: str, source: str) -> None:
+    def _linkto_check(self, data, links, source: str) -> None:
         """
         Check that node exists in the database. This is used to check that linkto and email point to an existing record
-        in the database.
+        in the database. Also check that links and emails are not duplicated.
         :param data: Loaded yaml database.
-        :param node: str, The name of the node we are checking for existence.
+        :param links: List of links/emails of the given website or company or email
         :param source: str, The name of the node where the node was found.
         :return: None
         :exception FormatError if the node does not exist in the database.
         """
+        records = []
+        # Get all top level nodes
         for _, values in data.items():
             for record in values:
-                if list(record)[0] == node:
-                    return
-        raise FormatError(self.DATABASE_ERROR + str(source) + ' points to invalid record ' + str(node))
+                # Get each record name into a common list of all records
+                records.append(list(record)[0])
+        for link in links:
+            if link not in records:
+                raise FormatError(self.DATABASE_ERROR + str(source) + ' points to invalid record ' + str(link))
+            if links.count(link) > 1:
+                raise FormatError(self.DATABASE_ERROR + str(source) + ' contains duplicates of ' + str(link))
 
     def _attribute_check(self, valid_list, attr_dict, source) -> None:
         """
@@ -117,4 +130,6 @@ class Database:
             if attr not in list(attr_dict):
                 raise FormatError(self.DATABASE_ERROR + str(source) + ' missing or typo in attribute "' +
                                   str(attr) + '"')
-
+        if list(attr_dict) != valid_list:
+            extra = set(attr_dict).difference(set(valid_list))
+            raise FormatError(self.DATABASE_ERROR + str(source) + ' has extra attribute/s: ' + str(extra))
