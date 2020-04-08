@@ -42,7 +42,7 @@ class Database:
                         if char not in address:
                             raise FormatError(self.DATABASE_ERROR + str(address) + ' is missing "' + str(char) + '"')
                     # Check attribute names
-                    self._attribute_check(['password', 'question', 'linkto', 'notes'], values)
+                    self._attribute_check(['password', 'question', 'linkto', 'notes'], values, address)
                     # Check password is not empty
                     if not values['password']:
                         raise FormatError(self.DATABASE_ERROR + str(address) + ' has empty password')
@@ -65,7 +65,7 @@ class Database:
                     if len(web_address.split('.')) < 3:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is malformed')
                 # Check attribute names
-                self._attribute_check(['login', 'password', 'email', 'question', 'linkto', 'notes'], values)
+                self._attribute_check(['login', 'password', 'email', 'question', 'linkto', 'notes'], values, web_address)
 
             # Check company section
             for company in data['companies']:
@@ -87,14 +87,18 @@ class Database:
                     return
         raise FormatError(self.DATABASE_ERROR + str(source) + ' points to invalid record ' + str(node))
 
-    def _attribute_check(self, valid_list, attr_dict) -> None:
+    def _attribute_check(self, valid_list, attr_dict, source) -> None:
         """
         Check that keys in attr_dict only have names listed in valid_list.
         :param valid_list: List of allowed string key names (attributes in yaml)
         :param attr_dict: Record attributes from yaml. Like email data.
+        :param source: str, The name of the node where the node was found.
         :return: None
         :exception FormatError if attributes do not match.
         """
-        for attr in attr_dict.keys():
-            if attr not in valid_list:
-                raise FormatError(self.DATABASE_ERROR + 'invalid attribute "' + str(attr) + '"')
+        # Check each attribute is in the list once
+        for attr in valid_list:
+            if attr not in list(attr_dict):
+                raise FormatError(self.DATABASE_ERROR + str(source) + ' missing or typo in attribute "' +
+                                  str(attr) + '"')
+
