@@ -1,4 +1,5 @@
 import yaml
+
 from FormatError import FormatError
 
 
@@ -51,17 +52,20 @@ class Database:
                             self._linkto_check(data, link, address)
 
             # Check website section
-            # Check that website begins with www and contains a dot. Check that password/login is not empty.
-            # Check that each email record has required attributes. Check that each linkto/email attribute points
-            # to existing record.
+            # Check that website begins with www and contains a dot. Check that each website record has required
+            # attributes. Check that password/login is not empty. Check that each linkto/email attribute points
+            # to an existing record.
             for website in data['websites']:
                 if len(website.keys()) > 1:
                     raise FormatError(self.DATABASE_ERROR + str(website) + ' record is malformed')
                 # Check website format
-                for address, values in website.items():
-                    for string in ['www', '.']:
-                        if string not in address:
-                            raise FormatError(self.DATABASE_ERROR + str(address) + ' is missing "' + str(string) + '"')
+                for web_address, values in website.items():
+                    if 'www.' not in web_address:
+                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is missing www.')
+                    if len(web_address.split('.')) < 3:
+                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is malformed')
+                # Check attribute names
+                self._attribute_check(['login', 'password', 'email', 'question', 'linkto', 'notes'], values)
 
             # Check company section
             for company in data['companies']:
