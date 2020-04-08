@@ -55,7 +55,13 @@ class Database:
             # Check that each email record has required attributes. Check that each linkto/email attribute points
             # to existing record.
             for website in data['websites']:
-                print(website)
+                if len(website.keys()) > 1:
+                    raise FormatError(self.DATABASE_ERROR + str(website) + ' record is malformed')
+                # Check website format
+                for address, values in website.items():
+                    for string in ['www', '.']:
+                        if string not in address:
+                            raise FormatError(self.DATABASE_ERROR + str(address) + ' is missing "' + str(string) + '"')
 
             # Check company section
             for company in data['companies']:
