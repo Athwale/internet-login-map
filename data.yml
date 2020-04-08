@@ -14,6 +14,14 @@ emails:
       linkto: ~
       notes: ~
 
+  - mail3@volny.cz:
+      password: 'xxxpassword2'
+      question: 'question?'
+      linkto:
+        - 'bear@gmail.com'
+        - 'white@gmail.com'
+      notes: ~
+
 # Website records
 websites:
   - www.seznam.cz:
@@ -39,10 +47,11 @@ websites:
   - www.forum.com:
       login: 'polar'
       password: 'bear'
-      email:
-        - 'mail3@volny.cz'
-      question: 'response'
-      linkto: ~
+      email: ~
+      question: ~
+      linkto:
+        - 'www.forum.com'
+        - 'www.seznam.cz'
       notes: 'More notes'
 
 # Company records

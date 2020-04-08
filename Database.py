@@ -64,8 +64,22 @@ class Database:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is missing www.')
                     if len(web_address.split('.')) < 3:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is malformed')
-                # Check attribute names
-                self._attribute_check(['login', 'password', 'email', 'question', 'linkto', 'notes'], values, web_address)
+                    # Check attribute names
+                    self._attribute_check(['login', 'password', 'email', 'question', 'linkto', 'notes']
+                                          , values, web_address)
+                    # Check password and login is not empty
+                    if not values['login']:
+                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' has empty login')
+                    if not values['password']:
+                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' has empty password')
+                    # Check that emails point to an existing record
+                    if values['email']:
+                        for email in values['email']:
+                            self._linkto_check(data, email, web_address)
+                    # Check that each linkto point to an existing record
+                    if values['linkto']:
+                        for link in values['linkto']:
+                            self._linkto_check(data, link, web_address)
 
             # Check company section
             for company in data['companies']:
