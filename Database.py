@@ -82,6 +82,8 @@ class Database:
                             self._linkto_check(data, link, web_address)
 
             # Check company section
+            # Check that each company record has required attributes. Check that each linkto/email attribute points to
+            # an existing record.
             for company in data['companies']:
                 print(company)
 

@@ -2,21 +2,21 @@
 # E-mail records
 emails:
   - white@gmail.com:
-      password: 'xxxpassword'
+      password: 'youdont'
       question: '42'
       linkto:
         - 'bear@gmail.com'
-      notes: 'More info'
+      notes: 'Fascinating'
 
   - bear@gmail.com:
-      password: 'xxxpassword1'
-      question: 'answer'
+      password: 'wanttoknow'
+      question: ~
       linkto: ~
       notes: ~
 
-  - mail3@volny.cz:
-      password: 'xxxpassword2'
-      question: 'question?'
+  - whitebear@volny.cz:
+      password: 'thepassword'
+      question: 'what question?'
       linkto:
         - 'bear@gmail.com'
         - 'white@gmail.com'
@@ -24,48 +24,51 @@ emails:
 
 # Website records
 websites:
-  - www.seznam.cz:
+  - www.white-bear.cz:
       login: 'white'
-      password: 'testpass'
+      password: 'athwale'
       email:
-        - 'white@gmail.com'
+        - 'whitebear@volny.cz'
         - 'bear@gmail.com'
       question: 'medved'
-      linkto: ~
-      notes: 'Additional notes'
+      linkto:
+        - 'CORE'
+      notes: 'Interesting'
 
-  - www.forum.com:
+  - www.github.com:
       login: 'athwale'
-      password: 'testpass1'
+      password: 'probablyisnt'
       email:
         - 'white@gmail.com'
-      question: 'arctic'
-      linkto:
-        - 'www.seznam.cz'
+      question: 'dog'
+      linkto: ~
       notes: ~
 
-  - www.forum.com:
-      login: 'polar'
-      password: 'bear'
+  - www.github.com:
+      login: 'Sovvy'
+      password: 'correctpassword'
       email: ~
       question: ~
       linkto:
-        - 'www.forum.com'
-        - 'www.seznam.cz'
-      notes: 'More notes'
+        - 'www.github.com'
+        - 'www.white-bear.cz'
+      notes: 'Unforeseen'
 
 # Company records
 companies:
-  - XYZComp:
+  - CORE:
       email:
         - 'white@gmail.com'
       linkto:
-        - 'www.seznam.cz'
         - 'www.github.com'
         - 'www.white-bear.cz'
+        - 'WhiteBear'
+      notes: 'Consequences'
 
-  - WHITE-BEAR:
+  - WhiteBear:
       email:
         - 'bear@gmail.com'
+        - 'whitebear@volny.cz'
       linkto: ~
+      notes: ~
 ...
