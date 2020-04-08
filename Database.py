@@ -30,6 +30,8 @@ class Database:
                     raise FormatError(self.DATABASE_ERROR + str(section) + ' not in database.')
 
             # Check mail section
+            # Check that each email has @ and . in it. Check that each email record has required attributes.
+            # Check that email password is not empty. Check that each linkto attribute points to existing record.
             for mail in data['emails']:
                 if len(mail.keys()) > 1:
                     raise FormatError(self.DATABASE_ERROR + str(mail) + ' record is malformed')
@@ -49,7 +51,15 @@ class Database:
                             self._linkto_check(data, link, address)
 
             # Check website section
+            # Check that website begins with www and contains a dot. Check that password/login is not empty.
+            # Check that each email record has required attributes. Check that each linkto/email attribute points
+            # to existing record.
+            for website in data['websites']:
+                print(website)
 
+            # Check company section
+            for company in data['companies']:
+                print(company)
 
     def _linkto_check(self, data, node: str, source: str) -> None:
         """
