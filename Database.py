@@ -142,4 +142,14 @@ class Database:
         :param string: The strings that the record must contain.
         :return: A list of yaml records.
         """
-        pass
+        found = []
+        string = string.lower()
+        with open(self._database_file, "r") as yml:
+            data = yaml.safe_load(yml)
+            # Check main sections
+            for section in ['emails', 'websites', 'companies']:
+                for record in data[section]:
+                    if string in list(record)[0].lower():
+                        found.append(record)
+
+        return found
