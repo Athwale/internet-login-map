@@ -19,7 +19,26 @@ def print_record(records):
     """
     for record in records:
         for name, values in record.items():
-            print(name)
+            print('\n' + str(name))
+            if '@' in name:
+                print('\t' + 'login: ' + name.split('@')[0])
+            for attribute, content in values.items():
+                if attribute in ['email', 'linkto']:
+                    if attribute == 'email':
+                        if content:
+                            print('\t' + 'e-mails:')
+                        else:
+                            print('\t' + 'e-mails: -')
+                    else:
+                        if content:
+                            print('\t' + 'link to:')
+                        else:
+                            print('\t' + 'link to: -')
+                    if content:
+                        for item in content:
+                            print('\t\t' + str(item))
+                else:
+                    print('\t' + str(attribute) + ': ' + ('-' if not content else str(content)))
 
 
 if __name__ == "__main__":
