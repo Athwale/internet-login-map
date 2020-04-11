@@ -136,13 +136,18 @@ class Database:
             extra = set(attr_dict).difference(set(valid_list))
             raise FormatError(self.DATABASE_ERROR + str(source) + ' has extra attribute/s: ' + str(extra))
 
-    def add_in_not_in(self, item, dict_list):
+    @staticmethod
+    def _add_in_not_in(item, dict_list):
         """
-
+        Add item to list only if it is not already in there.
         :param item: Item to add, this is a dictionary yaml database record with one key.
         :param dict_list: This is a list of of items as above.
-        :return:
+        :return: None
         """
+        item_key = list(item)[0]
+        found_keys = [list(name)[0] for name in dict_list]
+        if item_key not in found_keys:
+            dict_list.append(item)
 
     def find(self, string: str):
         """
@@ -159,15 +164,15 @@ class Database:
                 for record in data[section]:
                     # Check node names
                     if string in list(record)[0].lower():
-                        found.append(record)
+                        self._add_in_not_in(record, found)
                     # Check inner data
                     data_dict = record[list(record)[0]]
                     for attribute, content in data_dict.items():
                         if isinstance(content, List):
                             for item in content:
                                 if item and string in str(item):
-                                    found.append(record)
+                                    self._add_in_not_in(record, found)
                         else:
                             if content and string in str(content):
-                                found.append(record)
+                                self._add_in_not_in(record, found)
         return found
