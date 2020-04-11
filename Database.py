@@ -136,6 +136,14 @@ class Database:
             extra = set(attr_dict).difference(set(valid_list))
             raise FormatError(self.DATABASE_ERROR + str(source) + ' has extra attribute/s: ' + str(extra))
 
+    def add_in_not_in(self, item, dict_list):
+        """
+
+        :param item: Item to add, this is a dictionary yaml database record with one key.
+        :param dict_list: This is a list of of items as above.
+        :return:
+        """
+
     def find(self, string: str):
         """
         Find records in database that contain the string. Go through all records and look for the string.
@@ -149,7 +157,17 @@ class Database:
             # Check main sections
             for section in ['emails', 'websites', 'companies']:
                 for record in data[section]:
+                    # Check node names
                     if string in list(record)[0].lower():
                         found.append(record)
-
+                    # Check inner data
+                    data_dict = record[list(record)[0]]
+                    for attribute, content in data_dict.items():
+                        if isinstance(content, List):
+                            for item in content:
+                                if item and string in str(item):
+                                    found.append(record)
+                        else:
+                            if content and string in str(content):
+                                found.append(record)
         return found
