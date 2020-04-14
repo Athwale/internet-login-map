@@ -194,17 +194,21 @@ class Database:
             # Check main sections
             for section in ['emails', 'websites', 'companies']:
                 for record in data[section]:
-                    # Check node names
-                    if string in list(record)[0].lower():
+                    # Special case empty search string means we want all
+                    if not string:
                         self._add_in_not_in(record, found)
-                    # Check inner data
-                    data_dict = record[list(record)[0]]
-                    for attribute, content in data_dict.items():
-                        if isinstance(content, List):
-                            for item in content:
-                                if item and string in str(item):
+                    else:
+                        # Check node names
+                        if string in list(record)[0].lower():
+                            self._add_in_not_in(record, found)
+                        # Check inner data
+                        data_dict = record[list(record)[0]]
+                        for attribute, content in data_dict.items():
+                            if isinstance(content, List):
+                                for item in content:
+                                    if item and string in str(item):
+                                        self._add_in_not_in(record, found)
+                            else:
+                                if content and string in str(content):
                                     self._add_in_not_in(record, found)
-                        else:
-                            if content and string in str(content):
-                                self._add_in_not_in(record, found)
         return found
