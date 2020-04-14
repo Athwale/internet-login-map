@@ -2,7 +2,7 @@
 # E-mail records
 emails:
   - white@gmail.com:
-      id: 0
+      id: 1
       password: 'youdont'
       question: '42'
       linkto:
@@ -10,14 +10,14 @@ emails:
       notes: 'Fascinating'
 
   - bear@gmail.com:
-      id: 1
+      id: 2
       password: 'wanttoknow'
       question: ~
       linkto: ~
       notes: ~
 
   - whitebear@volny.cz:
-      id: 2
+      id: 3
       password: 'thepassword'
       question: 'what question?'
       linkto:
@@ -28,7 +28,7 @@ emails:
 # Website records
 websites:
   - www.white-bear.cz:
-      id: 3
+      id: 4
       login: 'white'
       password: 'athwale'
       email:
@@ -40,7 +40,7 @@ websites:
       notes: 'Interesting'
 
   - www.github.com:
-      id: 4
+      id: 5
       login: 'athwale'
       password: 'probablyisnt'
       email:
@@ -50,7 +50,7 @@ websites:
       notes: ~
 
   - www.github.com:
-      id: 5
+      id: 6
       login: 'Sovvy'
       password: 'correctpassword'
       email: ~
@@ -63,7 +63,7 @@ websites:
 # Company records
 companies:
   - CORE:
-      id: 6
+      id: 7
       email:
         - 'white@gmail.com'
       linkto:
@@ -73,7 +73,7 @@ companies:
       notes: 'Consequences'
 
   - WhiteBear:
-      id: 7
+      id: 8
       email:
         - 'bear@gmail.com'
         - 'whitebear@volny.cz'
@@ -81,7 +81,7 @@ companies:
       notes: ~
 
   - Zoo:
-      id: 8
+      id: 9
       email: ~
       linkto: ~
       notes: ~

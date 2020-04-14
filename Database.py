@@ -18,12 +18,14 @@ class Database:
         :param file: str, database file name.
         """
         self._database_file = file
+        self._id_list = []
 
     def validate(self) -> bool:
         """
         Check database file for errors.
         :return: bool True if validation passed, exception FormatError is thrown otherwise.
         """
+        self._id_list.clear()
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             # Check main sections
@@ -32,18 +34,21 @@ class Database:
                     raise FormatError(self.DATABASE_ERROR + str(section) + ' not in database.')
 
             # Check mail section
-            # Check that each email has @ and . in it. Check that each email record has required attributes.
-            # Check that email password is not empty. Check that each linkto attribute points to existing record.
+            # Check that each email has an id. Check that each email has @ and . in it. Check that each email record has
+            # required attributes. Check that email password is not empty. Check that each linkto attribute points to
+            # existing record.
             for mail in data['emails']:
                 if len(mail.keys()) > 1:
                     raise FormatError(self.DATABASE_ERROR + str(mail) + ' record is malformed')
-                # Check mail format
                 for address, values in mail.items():
+                    # Check id
+                    self._id_check(values, address)
+                    # Check mail format
                     for char in ['@', '.']:
                         if char not in address:
                             raise FormatError(self.DATABASE_ERROR + str(address) + ' is missing "' + str(char) + '"')
                     # Check attribute names
-                    self._attribute_check(['password', 'question', 'linkto', 'notes'], values, address)
+                    self._attribute_check(['id', 'password', 'question', 'linkto', 'notes'], values, address)
                     # Check password is not empty
                     if not values['password']:
                         raise FormatError(self.DATABASE_ERROR + str(address) + ' has empty password')
@@ -54,18 +59,20 @@ class Database:
             # Check website section
             # Check that website begins with www and contains a dot. Check that each website record has required
             # attributes. Check that password/login is not empty. Check that each linkto/email attribute points
-            # to an existing record.
+            # to an existing record. Check correct id.
             for website in data['websites']:
                 if len(website.keys()) > 1:
                     raise FormatError(self.DATABASE_ERROR + str(website) + ' record is malformed')
                 # Check website format
                 for web_address, values in website.items():
+                    # Check id
+                    self._id_check(values, web_address)
                     if 'www.' not in web_address:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is missing www.')
                     if len(web_address.split('.')) < 3:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is malformed')
                     # Check attribute names
-                    self._attribute_check(['login', 'password', 'email', 'question', 'linkto', 'notes']
+                    self._attribute_check(['id', 'login', 'password', 'email', 'question', 'linkto', 'notes']
                                           , values, web_address)
                     # Check password and login is not empty
                     if not values['login']:
@@ -81,13 +88,15 @@ class Database:
 
             # Check company section
             # Check that each company record has required attributes. Check that each linkto/email attribute points to
-            # an existing record.
+            # an existing record. Check correct id.
             for company in data['companies']:
                 if len(company.keys()) > 1:
                     raise FormatError(self.DATABASE_ERROR + str(company) + ' record is malformed')
                 for company_name, values in company.items():
+                    # Check id
+                    self._id_check(values, company_name)
                     # Check attribute names
-                    self._attribute_check(['email', 'linkto', 'notes'], values, company_name)
+                    self._attribute_check(['id', 'email', 'linkto', 'notes'], values, company_name)
                     # Check that emails point to an existing record
                     if values['email']:
                         self._linkto_check(data, values['email'], web_address)
@@ -95,6 +104,29 @@ class Database:
                     if values['linkto']:
                         self._linkto_check(data, values['linkto'], web_address)
         return True
+
+    def _id_check(self, values, source: str):
+        """
+        Check that id is valid and has never been used anywhere else.
+        :param values: a dictionary of values of a record
+        :param source: the name of the record
+        :return: None
+        """
+        record_id = values['id']
+        if record_id:
+            if not isinstance(record_id, int):
+                raise FormatError(self.DATABASE_ERROR + str(source) + ' has non-integer id: ' + str(record_id))
+            if not record_id > 0:
+                raise FormatError(self.DATABASE_ERROR + str(source) + ' has incorrect id: ' + str(record_id))
+        else:
+            if record_id == 0:
+                raise FormatError(self.DATABASE_ERROR + str(source) + ' id must be positive')
+            raise FormatError(self.DATABASE_ERROR + str(source) + ' has no id')
+        # Check for duplicity
+        if record_id in self._id_list:
+            raise FormatError(self.DATABASE_ERROR + str(source) + ' has duplicate id: ' + str(record_id))
+        else:
+            self._id_list.append(record_id)
 
     def _linkto_check(self, data, links: List[str], source: str) -> None:
         """
