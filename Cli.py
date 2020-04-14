@@ -22,8 +22,6 @@ def print_record(records):
     for record in records:
         for name, values in record.items():
             print('\n' + Fore.GREEN + str(name) + Fore.RESET)
-            if '@' in name:
-                print('\t' + 'login: ' + Fore.LIGHTBLUE_EX + name.split('@')[0] + Fore.RESET)
             for attribute, content in values.items():
                 if attribute in ['email', 'linkto']:
                     if attribute == 'email':

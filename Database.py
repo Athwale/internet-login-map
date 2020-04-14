@@ -48,7 +48,7 @@ class Database:
                         if char not in address:
                             raise FormatError(self.DATABASE_ERROR + str(address) + ' is missing "' + str(char) + '"')
                     # Check attribute names
-                    self._attribute_check(['id', 'password', 'question', 'linkto', 'notes'], values, address)
+                    self._attribute_check(['id', 'login', 'password', 'question', 'linkto', 'notes'], values, address)
                     # Check password is not empty
                     if not values['password']:
                         raise FormatError(self.DATABASE_ERROR + str(address) + ' has empty password')
