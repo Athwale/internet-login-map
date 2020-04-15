@@ -72,8 +72,8 @@ class Database:
                     if len(web_address.split('.')) < 3:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is malformed')
                     # Check attribute names
-                    self._attribute_check(['id', 'login', 'password', 'email', 'question', 'linkto', 'notes']
-                                          , values, web_address)
+                    self._attribute_check(['id', 'login', 'password', 'email', 'question', 'linkto', 'notes'],
+                                          values, web_address)
                     # Check password and login is not empty
                     if not values['login']:
                         raise FormatError(self.DATABASE_ERROR + str(web_address) + ' has empty login')
@@ -213,15 +213,36 @@ class Database:
                                     self._add_in_not_in(record, found)
         return found
 
-    def add(self):
+    def add(self) -> bool:
         """
 
-        :return:
+        :return: True if added successfully.
         """
 
-    def delete(self, record_id: int):
+    def delete(self, record_id: int) -> bool:
         """
 
-        :param record_id:
-        :return:
+        :param record_id: int id of the record to be deleted
+        :return: True if removed successfully.
         """
+        with open(self._database_file, "r") as yml:
+            data = yaml.safe_load(yml)
+            # Go through everything looking for the id
+            for section in ['emails', 'websites', 'companies']:
+                for record in data[section]:
+                    data_dict = record[list(record)[0]]
+                    if data_dict['id'] == record_id:
+                        record.clear()
+                        return self.save(data)
+            raise FormatError(self.DATABASE_ERROR + 'record: ' + str(record_id) + ' not found')
+
+    @staticmethod
+    def save(yml) -> bool:
+        """
+        Save database onto disk.
+        :param yml: Modified yaml database to save.
+        :return: True if saved successfully.
+        """
+        print(yml)
+
+        return True

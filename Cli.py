@@ -45,5 +45,4 @@ if __name__ == "__main__":
     database = Database(os.path.realpath(os.path.join('.', 'data.yml')))
     if database.validate():
         print_message('Database OK')
-    found = database.find('')
-    print_record(found)
+    print(database.delete(9))
