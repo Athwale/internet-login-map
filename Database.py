@@ -232,17 +232,17 @@ class Database:
                 for record in data[section]:
                     data_dict = record[list(record)[0]]
                     if data_dict['id'] == record_id:
-                        record.clear()
+                        del data[section][data[section].index(record)]
                         return self.save(data)
             raise FormatError(self.DATABASE_ERROR + 'record: ' + str(record_id) + ' not found')
 
-    @staticmethod
-    def save(yml) -> bool:
+    def save(self, yml) -> bool:
         """
-        Save database onto disk.
+        Save database onto disk replacing the workCopy file on disk.
         :param yml: Modified yaml database to save.
         :return: True if saved successfully.
         """
         print(yml)
-
+        with open(self._database_file, 'w') as output_file:
+            yaml.safe_dump(yml, output_file)
         return True

@@ -1,7 +1,7 @@
 from Database import Database
-from colorama import Fore, Style
 import os
 from colorama import Fore
+import shutil
 
 
 def print_message(message: str):
@@ -42,7 +42,9 @@ def print_record(records):
 
 
 if __name__ == "__main__":
-    database = Database(os.path.realpath(os.path.join('.', 'data.yml')))
+    data = 'data.yml'
+    shutil.copyfile(data, 'workCopy.yml')
+    database = Database(os.path.realpath(os.path.join('.', 'workCopy.yml')))
     if database.validate():
         print_message('Database OK')
     print(database.delete(9))
