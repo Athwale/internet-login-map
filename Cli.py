@@ -50,4 +50,4 @@ if __name__ == "__main__":
     database = Database(os.path.realpath(os.path.join('.', 'workCopy.yml')))
     if database.validate():
         print_message('Database OK')
-    print_record(database.find(''))
+    print_record(database.find('hhjy'))

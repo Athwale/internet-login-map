@@ -10,7 +10,8 @@ class Database:
     This class works with the yaml database. Performs add, remove, change, find and validation.
     """
 
-    DATABASE_ERROR = 'Database format error, '
+    DATABASE_FORMAT_ERROR = 'Database format error, '
+    DATABASE_ERROR = 'Database error, '
 
     def __init__(self, file: str):
         """
@@ -31,7 +32,7 @@ class Database:
             # Check main sections
             for section in ['emails', 'websites', 'companies']:
                 if section not in data.keys():
-                    raise FormatError(self.DATABASE_ERROR + str(section) + ' not in database.')
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(section) + ' not in database.')
 
             # Check mail section
             # Check that each email has an id. Check that each email has @ and . in it. Check that each email record has
@@ -39,19 +40,20 @@ class Database:
             # existing record.
             for mail in data['emails']:
                 if len(mail.keys()) > 1:
-                    raise FormatError(self.DATABASE_ERROR + str(mail) + ' record is malformed')
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(mail) + ' record is malformed')
                 for address, values in mail.items():
                     # Check id
                     self._id_check(values, address)
                     # Check mail format
                     for char in ['@', '.']:
                         if char not in address:
-                            raise FormatError(self.DATABASE_ERROR + str(address) + ' is missing "' + str(char) + '"')
+                            raise FormatError(self.DATABASE_FORMAT_ERROR + str(address) + ' is missing "' + str(char)
+                                              + '"')
                     # Check attribute names
                     self._attribute_check(['id', 'login', 'password', 'question', 'linkto', 'notes'], values, address)
                     # Check password is not empty
                     if not values['password']:
-                        raise FormatError(self.DATABASE_ERROR + str(address) + ' has empty password')
+                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(address) + ' has empty password')
                     # Check that linkto points to an existing record
                     if values['linkto']:
                         self._linkto_check(data, values['linkto'], address)
@@ -62,23 +64,23 @@ class Database:
             # to an existing record. Check correct id.
             for website in data['websites']:
                 if len(website.keys()) > 1:
-                    raise FormatError(self.DATABASE_ERROR + str(website) + ' record is malformed')
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(website) + ' record is malformed')
                 # Check website format
                 for web_address, values in website.items():
                     # Check id
                     self._id_check(values, web_address)
                     if 'www.' not in web_address:
-                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is missing www.')
+                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' is missing www.')
                     if len(web_address.split('.')) < 3:
-                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' is malformed')
+                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' is malformed')
                     # Check attribute names
                     self._attribute_check(['id', 'login', 'password', 'email', 'question', 'linkto', 'notes'],
                                           values, web_address)
                     # Check password and login is not empty
                     if not values['login']:
-                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' has empty login')
+                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' has empty login')
                     if not values['password']:
-                        raise FormatError(self.DATABASE_ERROR + str(web_address) + ' has empty password')
+                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' has empty password')
                     # Check that emails point to an existing record
                     if values['email']:
                         self._linkto_check(data, values['email'], web_address)
@@ -91,7 +93,7 @@ class Database:
             # an existing record. Check correct id.
             for company in data['companies']:
                 if len(company.keys()) > 1:
-                    raise FormatError(self.DATABASE_ERROR + str(company) + ' record is malformed')
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(company) + ' record is malformed')
                 for company_name, values in company.items():
                     # Check id
                     self._id_check(values, company_name)
@@ -115,16 +117,16 @@ class Database:
         record_id = values['id']
         if record_id:
             if not isinstance(record_id, int):
-                raise FormatError(self.DATABASE_ERROR + str(source) + ' has non-integer id: ' + str(record_id))
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' has non-integer id: ' + str(record_id))
             if not record_id > 0:
-                raise FormatError(self.DATABASE_ERROR + str(source) + ' has incorrect id: ' + str(record_id))
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' has incorrect id: ' + str(record_id))
         else:
             if record_id == 0:
-                raise FormatError(self.DATABASE_ERROR + str(source) + ' id must be positive')
-            raise FormatError(self.DATABASE_ERROR + str(source) + ' has no id')
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' id must be positive')
+            raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' has no id')
         # Check for duplicity
         if record_id in self._id_list:
-            raise FormatError(self.DATABASE_ERROR + str(source) + ' has duplicate id: ' + str(record_id))
+            raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' has duplicate id: ' + str(record_id))
         else:
             self._id_list.append(record_id)
 
@@ -146,9 +148,9 @@ class Database:
                 records.append(list(record)[0])
         for link in links:
             if link not in records:
-                raise FormatError(self.DATABASE_ERROR + str(source) + ' points to invalid record ' + str(link))
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' points to invalid record ' + str(link))
             if links.count(link) > 1:
-                raise FormatError(self.DATABASE_ERROR + str(source) + ' contains duplicates of ' + str(link))
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' contains duplicates of ' + str(link))
 
     def _attribute_check(self, valid_list: List[str], attr_dict, source: str) -> None:
         """
@@ -162,11 +164,11 @@ class Database:
         # Check each attribute is in the list once
         for attr in valid_list:
             if attr not in list(attr_dict):
-                raise FormatError(self.DATABASE_ERROR + str(source) + ' missing or typo in attribute "' +
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' missing or typo in attribute "' +
                                   str(attr) + '"')
         if sorted(list(attr_dict)) != sorted(valid_list):
             extra = set(attr_dict).difference(set(valid_list))
-            raise FormatError(self.DATABASE_ERROR + str(source) + ' has extra attribute/s: ' + str(extra))
+            raise FormatError(self.DATABASE_FORMAT_ERROR + str(source) + ' has extra attribute/s: ' + str(extra))
 
     @staticmethod
     def _add_in_not_in(item, dict_list):
@@ -211,6 +213,8 @@ class Database:
                             else:
                                 if content and string in str(content):
                                     self._add_in_not_in(record, found)
+        if not found:
+            raise FormatError(self.DATABASE_ERROR + 'nothing found')
         return found
 
     def add(self) -> bool:
@@ -221,6 +225,7 @@ class Database:
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             self.save(data)
+            return True
 
     def delete(self, record_id: int) -> bool:
         """
