@@ -105,7 +105,7 @@ class Database:
                         self._linkto_check(data, values['linkto'], web_address)
         return True
 
-    def _id_check(self, values, source: str):
+    def _id_check(self, values, source: str) -> None:
         """
         Check that id is valid and has never been used anywhere else.
         :param values: a dictionary of values of a record
@@ -212,3 +212,16 @@ class Database:
                                 if content and string in str(content):
                                     self._add_in_not_in(record, found)
         return found
+
+    def add(self):
+        """
+
+        :return:
+        """
+
+    def delete(self, record_id: int):
+        """
+
+        :param record_id:
+        :return:
+        """
