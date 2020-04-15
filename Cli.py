@@ -1,7 +1,9 @@
-from Database import Database
 import os
-from colorama import Fore
 import shutil
+
+from colorama import Fore
+
+from Database import Database
 
 
 def print_message(message: str):
@@ -38,7 +40,8 @@ def print_record(records):
                         for item in content:
                             print('\t\t' + Fore.YELLOW + str(item) + Fore.RESET)
                 else:
-                    print('\t' + str(attribute) + ': ' + ('-' if not content else Fore.LIGHTBLUE_EX + str(content) + Fore.RESET))
+                    print('\t' + str(attribute) + ': ' + (
+                        '-' if not content else Fore.LIGHTBLUE_EX + str(content) + Fore.RESET))
 
 
 if __name__ == "__main__":
@@ -47,4 +50,4 @@ if __name__ == "__main__":
     database = Database(os.path.realpath(os.path.join('.', 'workCopy.yml')))
     if database.validate():
         print_message('Database OK')
-    print(database.delete(9))
+    print_record(database.find(''))

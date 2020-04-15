@@ -164,7 +164,7 @@ class Database:
             if attr not in list(attr_dict):
                 raise FormatError(self.DATABASE_ERROR + str(source) + ' missing or typo in attribute "' +
                                   str(attr) + '"')
-        if list(attr_dict) != valid_list:
+        if sorted(list(attr_dict)) != sorted(valid_list):
             extra = set(attr_dict).difference(set(valid_list))
             raise FormatError(self.DATABASE_ERROR + str(source) + ' has extra attribute/s: ' + str(extra))
 
@@ -218,10 +218,14 @@ class Database:
 
         :return: True if added successfully.
         """
+        with open(self._database_file, "r") as yml:
+            data = yaml.safe_load(yml)
+            self.save(data)
 
     def delete(self, record_id: int) -> bool:
         """
-
+        Remove a record from the database based on the record ID. Then save the new database onto disk rewriting the
+        current workCopy file.
         :param record_id: int id of the record to be deleted
         :return: True if removed successfully.
         """
@@ -242,7 +246,6 @@ class Database:
         :param yml: Modified yaml database to save.
         :return: True if saved successfully.
         """
-        print(yml)
         with open(self._database_file, 'w') as output_file:
             yaml.safe_dump(yml, output_file)
         return True

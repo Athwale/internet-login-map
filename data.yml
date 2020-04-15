@@ -1,91 +1,78 @@
----
-# E-mail records
-emails:
-  - white@gmail.com:
-      id: 1
-      login: 'white'
-      password: 'youdont'
-      question: '42'
-      linkto:
-        - 'bear@gmail.com'
-      notes: 'Fascinating'
-
-  - bear@gmail.com:
-      id: 2
-      login: 'bear'
-      password: 'wanttoknow'
-      question: ~
-      linkto: ~
-      notes: ~
-
-  - whitebear@volny.cz:
-      id: 3
-      login: 'whitebear'
-      password: 'thepassword'
-      question: 'what question?'
-      linkto:
-        - 'bear@gmail.com'
-        - 'white@gmail.com'
-      notes: ~
-
-# Website records
-websites:
-  - www.white-bear.cz:
-      id: 4
-      login: 'white'
-      password: 'athwale'
-      email:
-        - 'whitebear@volny.cz'
-        - 'bear@gmail.com'
-      question: 'medved'
-      linkto:
-        - 'CORE'
-      notes: 'Interesting'
-
-  - www.github.com:
-      id: 5
-      login: 'athwale'
-      password: 'probablyisnt'
-      email:
-        - 'white@gmail.com'
-      question: 'dog'
-      linkto: ~
-      notes: ~
-
-  - www.github.com:
-      id: 6
-      login: 'Sovvy'
-      password: 'correctpassword'
-      email: ~
-      question: ~
-      linkto:
-        - 'www.github.com'
-        - 'www.white-bear.cz'
-      notes: 'Unforeseen'
-
-# Company records
 companies:
-  - CORE:
-      id: 7
-      email:
-        - 'white@gmail.com'
-      linkto:
-        - 'www.github.com'
-        - 'www.white-bear.cz'
-        - 'WhiteBear'
-      notes: 'Consequences'
-
-  - WhiteBear:
-      id: 8
-      email:
-        - 'bear@gmail.com'
-        - 'whitebear@volny.cz'
-      linkto: ~
-      notes: ~
-
-  - Zoo:
-      id: 9
-      email: ~
-      linkto: ~
-      notes: ~
-...
+- CORE:
+    email:
+    - white@gmail.com
+    id: 7
+    linkto:
+    - www.github.com
+    - www.white-bear.cz
+    - WhiteBear
+    notes: Consequences
+- WhiteBear:
+    email:
+    - bear@gmail.com
+    - whitebear@volny.cz
+    id: 8
+    linkto: null
+    notes: null
+- Zoo:
+    email: null
+    id: 9
+    linkto: null
+    notes: null
+emails:
+- white@gmail.com:
+    id: 1
+    linkto:
+    - bear@gmail.com
+    login: white
+    notes: Fascinating
+    password: youdont
+    question: '42'
+- bear@gmail.com:
+    id: 2
+    linkto: null
+    login: bear
+    notes: null
+    password: wanttoknow
+    question: null
+- whitebear@volny.cz:
+    id: 3
+    linkto:
+    - bear@gmail.com
+    - white@gmail.com
+    login: whitebear
+    notes: null
+    password: thepassword
+    question: what question?
+websites:
+- www.white-bear.cz:
+    email:
+    - whitebear@volny.cz
+    - bear@gmail.com
+    id: 4
+    linkto:
+    - CORE
+    login: white
+    notes: Interesting
+    password: athwale
+    question: medved
+- www.github.com:
+    email:
+    - white@gmail.com
+    id: 5
+    linkto: null
+    login: athwale
+    notes: null
+    password: probablyisnt
+    question: dog
+- www.github.com:
+    email: null
+    id: 6
+    linkto:
+    - www.github.com
+    - www.white-bear.cz
+    login: Sovvy
+    notes: Unforeseen
+    password: correctpassword
+    question: null
