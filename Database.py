@@ -219,7 +219,7 @@ class Database:
 
     def add(self) -> bool:
         """
-
+        Add a record into the database.
         :return: True if added successfully.
         """
         with open(self._database_file, "r") as yml:
