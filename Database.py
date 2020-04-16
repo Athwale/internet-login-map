@@ -262,3 +262,10 @@ class Database:
         with open(self._database_file, 'w') as output_file:
             yaml.safe_dump(yml, output_file)
         return True
+
+    def get_new_id(self) -> int:
+        """
+        Return a new unused id for a new record.
+        :return: int, new unused record id.
+        """
+        return sorted(self._id_list).pop() + 1
