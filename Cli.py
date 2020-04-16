@@ -53,4 +53,6 @@ if __name__ == "__main__":
     new_record = {'newmail@seznam.cz': {'id': 10, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'newmail',
                                         'notes': None, 'password': 'thepassword', 'question': 'what question?'}}
     database.add('emails', new_record)
+    database.add('emails', new_record)
+
     print(database.get_new_id())

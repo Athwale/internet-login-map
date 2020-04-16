@@ -229,9 +229,12 @@ class Database:
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             if kind in ['emails', 'websites', 'companies']:
-                data[kind].append(new_record)
+                if new_record in data[kind]:
+                    raise FormatError(self.DATABASE_ERROR + 'record already exists in: ' + str(kind))
+                else:
+                    data[kind].append(new_record)
             else:
-                raise FormatError(self.DATABASE_ERROR + 'unknown data category ' + str(kind))
+                raise FormatError(self.DATABASE_ERROR + 'unknown data category: ' + str(kind))
         self.save(data)
         return True
 
@@ -259,6 +262,7 @@ class Database:
         :param yml: Modified yaml database to save.
         :return: True if saved successfully.
         """
+        # TODO validate new data here
         with open(self._database_file, 'w') as output_file:
             yaml.safe_dump(yml, output_file)
         return True
@@ -268,4 +272,4 @@ class Database:
         Return a new unused id for a new record.
         :return: int, new unused record id.
         """
-        return sorted(self._id_list).pop() + 1
+        return sorted(self._id_list)[-1] + 1
