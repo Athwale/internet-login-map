@@ -50,4 +50,6 @@ if __name__ == "__main__":
     database = Database(os.path.realpath(os.path.join('.', 'workCopy.yml')))
     if database.validate():
         print_message('Database OK')
-    print_record(database.find('hhjy'))
+    new_record = {'newmail@seznam.cz': {'id': 10, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'newmail',
+                                        'notes': None, 'password': 'thepassword', 'question': 'what question?'}}
+    database.add('emails', new_record)

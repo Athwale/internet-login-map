@@ -217,15 +217,23 @@ class Database:
             raise FormatError(self.DATABASE_ERROR + 'nothing found')
         return found
 
-    def add(self) -> bool:
+    def add(self, kind: str, new_record) -> bool:
         """
-        Add a record into the database.
+        Add a record into the database. Records look like this:
+        {'whitebear@volny.cz': {'id': 3, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'whitebear',
+        'notes': None, 'password': 'thepassword', 'question': 'what question?'}}
+        :param kind: What type od data is the new record, may be ['emails', 'websites', 'companies']
+        :param new_record: yaml style dictionary data of the record.
         :return: True if added successfully.
         """
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
-            self.save(data)
-            return True
+            if kind in ['emails', 'websites', 'companies']:
+                data[kind].append(new_record)
+            else:
+                raise FormatError(self.DATABASE_ERROR + 'unknown data category ' + str(kind))
+        self.save(data)
+        return True
 
     def delete(self, record_id: int) -> bool:
         """
