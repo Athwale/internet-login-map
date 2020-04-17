@@ -47,8 +47,8 @@ def print_record(records):
 if __name__ == "__main__":
     data = 'data.yml'
     shutil.copyfile(data, 'workCopy.yml')
-    database = Database(os.path.realpath(os.path.join('.', 'workCopy.yml')))
-    if database.validate():
+    database = Database()
+    if database.load(os.path.realpath(os.path.join('.', 'workCopy.yml'))):
         print_message('Database OK')
     new_record = {'newmail@seznam.cz': {'id': 10, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'newmail',
                                         'notes': None, 'password': 'thepassword', 'question': 'what question?'}}

@@ -13,98 +13,96 @@ class Database:
     DATABASE_FORMAT_ERROR = 'Database format error, '
     DATABASE_ERROR = 'Database error, '
 
-    def __init__(self, file: str):
+    def __init__(self):
         """
         Constructor for database communicator.
-        :param file: str, database file name.
         """
-        self._database_file = file
+        self._database_file = None
         self._id_list = []
 
-    def validate(self) -> bool:
+    def _validate(self, data) -> bool:
         """
         Check database file for errors.
+        :param data: Loaded yaml database.
         :return: bool True if validation passed, exception FormatError is thrown otherwise.
         """
         self._id_list.clear()
-        with open(self._database_file, "r") as yml:
-            data = yaml.safe_load(yml)
-            # Check main sections
-            for section in ['emails', 'websites', 'companies']:
-                if section not in data.keys():
-                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(section) + ' not in database.')
+        # Check main sections
+        for section in ['emails', 'websites', 'companies']:
+            if section not in data.keys():
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(section) + ' not in database.')
 
-            # Check mail section
-            # Check that each email has an id. Check that each email has @ and . in it. Check that each email record has
-            # required attributes. Check that email password is not empty. Check that each linkto attribute points to
-            # existing record.
-            for mail in data['emails']:
-                if len(mail.keys()) > 1:
-                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(mail) + ' record is malformed')
-                for address, values in mail.items():
-                    # Check id
-                    self._id_check(values, address)
-                    # Check mail format
-                    for char in ['@', '.']:
-                        if char not in address:
-                            raise FormatError(self.DATABASE_FORMAT_ERROR + str(address) + ' is missing "' + str(char)
-                                              + '"')
-                    # Check attribute names
-                    self._attribute_check(['id', 'login', 'password', 'question', 'linkto', 'notes'], values, address)
-                    # Check password is not empty
-                    if not values['password']:
-                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(address) + ' has empty password')
-                    # Check that linkto points to an existing record
-                    if values['linkto']:
-                        self._linkto_check(data, values['linkto'], address)
+        # Check mail section
+        # Check that each email has an id. Check that each email has @ and . in it. Check that each email record has
+        # required attributes. Check that email password is not empty. Check that each linkto attribute points to
+        # existing record.
+        for mail in data['emails']:
+            if len(mail.keys()) > 1:
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(mail) + ' record is malformed')
+            for address, values in mail.items():
+                # Check id
+                self._id_check(values, address)
+                # Check mail format
+                for char in ['@', '.']:
+                    if char not in address:
+                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(address) + ' is missing "' + str(char)
+                                          + '"')
+                # Check attribute names
+                self._attribute_check(['id', 'login', 'password', 'question', 'linkto', 'notes'], values, address)
+                # Check password is not empty
+                if not values['password']:
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(address) + ' has empty password')
+                # Check that linkto points to an existing record
+                if values['linkto']:
+                    self._linkto_check(data, values['linkto'], address)
 
-            # Check website section
-            # Check that website begins with www and contains a dot. Check that each website record has required
-            # attributes. Check that password/login is not empty. Check that each linkto/email attribute points
-            # to an existing record. Check correct id.
-            for website in data['websites']:
-                if len(website.keys()) > 1:
-                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(website) + ' record is malformed')
-                # Check website format
-                for web_address, values in website.items():
-                    # Check id
-                    self._id_check(values, web_address)
-                    if 'www.' not in web_address:
-                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' is missing www.')
-                    if len(web_address.split('.')) < 3:
-                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' is malformed')
-                    # Check attribute names
-                    self._attribute_check(['id', 'login', 'password', 'email', 'question', 'linkto', 'notes'],
-                                          values, web_address)
-                    # Check password and login is not empty
-                    if not values['login']:
-                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' has empty login')
-                    if not values['password']:
-                        raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' has empty password')
-                    # Check that emails point to an existing record
-                    if values['email']:
-                        self._linkto_check(data, values['email'], web_address)
-                    # Check that each linkto point to an existing record
-                    if values['linkto']:
-                        self._linkto_check(data, values['linkto'], web_address)
+        # Check website section
+        # Check that website begins with www and contains a dot. Check that each website record has required
+        # attributes. Check that password/login is not empty. Check that each linkto/email attribute points
+        # to an existing record. Check correct id.
+        for website in data['websites']:
+            if len(website.keys()) > 1:
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(website) + ' record is malformed')
+            # Check website format
+            for web_address, values in website.items():
+                # Check id
+                self._id_check(values, web_address)
+                if 'www.' not in web_address:
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' is missing www.')
+                if len(web_address.split('.')) < 3:
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' is malformed')
+                # Check attribute names
+                self._attribute_check(['id', 'login', 'password', 'email', 'question', 'linkto', 'notes'],
+                                      values, web_address)
+                # Check password and login is not empty
+                if not values['login']:
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' has empty login')
+                if not values['password']:
+                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(web_address) + ' has empty password')
+                # Check that emails point to an existing record
+                if values['email']:
+                    self._linkto_check(data, values['email'], web_address)
+                # Check that each linkto point to an existing record
+                if values['linkto']:
+                    self._linkto_check(data, values['linkto'], web_address)
 
-            # Check company section
-            # Check that each company record has required attributes. Check that each linkto/email attribute points to
-            # an existing record. Check correct id.
-            for company in data['companies']:
-                if len(company.keys()) > 1:
-                    raise FormatError(self.DATABASE_FORMAT_ERROR + str(company) + ' record is malformed')
-                for company_name, values in company.items():
-                    # Check id
-                    self._id_check(values, company_name)
-                    # Check attribute names
-                    self._attribute_check(['id', 'email', 'linkto', 'notes'], values, company_name)
-                    # Check that emails point to an existing record
-                    if values['email']:
-                        self._linkto_check(data, values['email'], web_address)
-                    # Check that each linkto point to an existing record
-                    if values['linkto']:
-                        self._linkto_check(data, values['linkto'], web_address)
+        # Check company section
+        # Check that each company record has required attributes. Check that each linkto/email attribute points to
+        # an existing record. Check correct id.
+        for company in data['companies']:
+            if len(company.keys()) > 1:
+                raise FormatError(self.DATABASE_FORMAT_ERROR + str(company) + ' record is malformed')
+            for company_name, values in company.items():
+                # Check id
+                self._id_check(values, company_name)
+                # Check attribute names
+                self._attribute_check(['id', 'email', 'linkto', 'notes'], values, company_name)
+                # Check that emails point to an existing record
+                if values['email']:
+                    self._linkto_check(data, values['email'], company_name)
+                # Check that each linkto point to an existing record
+                if values['linkto']:
+                    self._linkto_check(data, values['linkto'], company_name)
         return True
 
     def _id_check(self, values, source: str) -> None:
@@ -266,6 +264,17 @@ class Database:
         with open(self._database_file, 'w') as output_file:
             yaml.safe_dump(yml, output_file)
         return True
+
+    def load(self, file) -> bool:
+        """
+        Open and validate the database.
+        :param file: str, database file name.
+        :return: True if opening and validating succeeded.
+        """
+        self._database_file = file
+        with open(self._database_file, "r") as yml:
+            data = yaml.safe_load(yml)
+            return self._validate(data)
 
     def get_new_id(self) -> int:
         """
