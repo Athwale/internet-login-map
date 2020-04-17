@@ -54,5 +54,3 @@ if __name__ == "__main__":
                                         'notes': None, 'password': 'thepassword', 'question': 'what question?'}}
     database.add('emails', new_record)
     database.add('emails', new_record)
-
-    print(database.get_new_id())

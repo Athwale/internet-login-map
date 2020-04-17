@@ -260,7 +260,7 @@ class Database:
         :param yml: Modified yaml database to save.
         :return: True if saved successfully.
         """
-        # TODO validate new data here
+        self._validate(yml)
         with open(self._database_file, 'w') as output_file:
             yaml.safe_dump(yml, output_file)
         return True
