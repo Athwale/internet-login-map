@@ -1,4 +1,5 @@
 from typing import List
+from graphviz import Digraph
 
 import yaml
 
@@ -282,3 +283,16 @@ class Database:
         :return: int, new unused record id.
         """
         return sorted(self._id_list)[-1] + 1
+
+    def graph(self, file_name: str):
+        """
+        Create a graph of database connections using graphviz. Save the graph as a vector image on the disk.
+        :param file_name: Name of the graph image file
+        :return: None
+        """
+        g = Digraph('G', filename=file_name, engine='neato')
+        g.node('A', color='red')
+        g.node('B', color='blue')
+        g.edge('A', 'B', color='yellow')
+        g.view()
+
