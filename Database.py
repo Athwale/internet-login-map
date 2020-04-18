@@ -291,8 +291,31 @@ class Database:
         :return: None
         """
         g = Digraph('G', filename=file_name, engine='neato')
-        g.node('A', color='red')
-        g.node('B', color='blue')
-        g.edge('A', 'B', color='yellow')
-        g.view()
+        color_list = ['blue', 'chartreuse', 'crimson', 'gold3', 'black', 'cyan', 'magenta', 'navyblue', 'palegreen1',
+                      'red', 'green', 'dimgray', 'sienna', 'indianred', 'teal']
+        mail_node_color = 'lightsteelblue'
+        company_node_color = 'darksalmon'
+        node_set = set()
 
+        # Create nodes for all records
+        with open(self._database_file, "r") as yml:
+            data = yaml.safe_load(yml)
+            for record in data['emails']:
+                node_set.add(list(record)[0].lower())
+            for node in node_set:
+                g.node(node, color=mail_node_color)
+
+            node_set.clear()
+            for record in data['websites']:
+                node_set.add(list(record)[0].lower())
+            for node in node_set:
+                g.node(node, color='black')
+
+            node_set.clear()
+            for record in data['companies']:
+                node_set.add(list(record)[0].lower())
+            for node in node_set:
+                g.node(node, color=company_node_color)
+
+        # g.edge('A', 'B', color='yellow')
+        g.view()
