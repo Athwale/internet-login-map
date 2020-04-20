@@ -284,18 +284,30 @@ class Database:
         """
         return sorted(self._id_list)[-1] + 1
 
+    @staticmethod
+    def _get_edge_color():
+        """
+        Yield next graph edge color.
+        :return: str, graphviz color name
+        """
+        color_list = ['blue', 'chartreuse', 'crimson', 'gold3', 'black', 'cyan', 'magenta', 'navyblue', 'palegreen1',
+                      'red', 'green', 'dimgray', 'sienna', 'indianred', 'teal']
+        while True:
+            for color in color_list:
+                yield color
+
     def graph(self, file_name: str):
         """
         Create a graph of database connections using graphviz. Save the graph as a vector image on the disk.
         :param file_name: Name of the graph image file
         :return: None
         """
-        g = Digraph('G', filename=file_name, engine='neato')
-        color_list = ['blue', 'chartreuse', 'crimson', 'gold3', 'black', 'cyan', 'magenta', 'navyblue', 'palegreen1',
-                      'red', 'green', 'dimgray', 'sienna', 'indianred', 'teal']
+        g = Digraph('net-map', filename=file_name)
+        g.graph_attr['rankdir'] = 'LR'
         mail_node_color = 'lightsteelblue'
         company_node_color = 'darksalmon'
         node_set = set()
+        color_generator = self._get_edge_color()
 
         with open(self._database_file, "r") as yml:
             # Create nodes for all records
@@ -324,7 +336,7 @@ class Database:
                         try:
                             if record[list(record)[0]][link_type]:
                                 for link in record[list(record)[0]][link_type]:
-                                    g.edge(list(record)[0], link)
+                                    g.edge(list(record)[0], link, color=next(color_generator))
                         except KeyError as ex:
                             continue
         g.view()
