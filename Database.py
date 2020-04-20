@@ -297,25 +297,34 @@ class Database:
         company_node_color = 'darksalmon'
         node_set = set()
 
-        # Create nodes for all records
         with open(self._database_file, "r") as yml:
+            # Create nodes for all records
             data = yaml.safe_load(yml)
             for record in data['emails']:
-                node_set.add(list(record)[0].lower())
+                node_set.add(list(record)[0])
             for node in node_set:
                 g.node(node, color=mail_node_color)
 
             node_set.clear()
             for record in data['websites']:
-                node_set.add(list(record)[0].lower())
+                node_set.add(list(record)[0])
             for node in node_set:
                 g.node(node, color='black')
 
             node_set.clear()
             for record in data['companies']:
-                node_set.add(list(record)[0].lower())
+                node_set.add(list(record)[0])
             for node in node_set:
                 g.node(node, color=company_node_color)
 
-        # g.edge('A', 'B', color='yellow')
+            # Create edges for emails and linktos
+            for section in ['emails', 'websites', 'companies']:
+                for record in data[section]:
+                    for link_type in ['email', 'linkto']:
+                        try:
+                            if record[list(record)[0]][link_type]:
+                                for link in record[list(record)[0]][link_type]:
+                                    g.edge(list(record)[0], link)
+                        except KeyError as ex:
+                            continue
         g.view()
