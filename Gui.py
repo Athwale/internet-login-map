@@ -2,7 +2,6 @@ import os
 import shutil
 from os import system
 
-from colorama import Fore
 from dialog import Dialog
 
 from Database import Database
@@ -18,7 +17,7 @@ class Gui:
         self._database_file = database_file
         self._database = Database()
 
-    def main_loop(self):
+    def main_loop(self) -> None:
         """
         Main Gui function to display console text based gui and handle inputs.
         :return: None
@@ -48,62 +47,59 @@ class Gui:
         system('clear')
 
     @staticmethod
-    def format_records(records):
-
+    def format_records(records) -> str:
         """
-        Nice print the passed list of records.
+        Return a nice string version of the record list passed into the method for display in GUI.
         :param records: List of yaml records
-        :return: None
+        :return: str, formatted string version of the records.
         """
         string = ''
         for record in records:
             for name, values in record.items():
-                string += '\n' + Fore.GREEN + str(name) + Fore.RESET
+                string += '\n' + str(name) + '\n'
                 for attribute, content in values.items():
                     if attribute in ['email', 'linkto']:
                         if attribute == 'email':
                             if content:
-                                string += '\t' + 'e-mails:'
+                                string += ' e-mails:\n'
                             else:
-                                string += '\t' + 'e-mails: -'
+                                string += ' e-mails: -\n'
                         else:
                             if content:
-                                string += '\t' + 'link to:'
+                                string += ' link to:\n'
                             else:
-                                string += '\t' + 'link to: -'
+                                string += ' link to: -\n'
                         if content:
                             for item in content:
-                                string += '\t\t' + Fore.YELLOW + str(item) + Fore.RESET
+                                string += '    ' + str(item) + '\n'
                     else:
-                        string += '\t' + str(attribute) + ': ' + (
-                            '-' if not content else Fore.LIGHTBLUE_EX + str(content) + Fore.RESET)
+                        string += ' ' + str(attribute) + ': ' + (
+                            '-\n' if not content else str(content) + '\n')
+        return string
 
-    def menu_find(self, dialog):
+    def menu_find(self, dialog) -> None:
+        """
+        Handle Find option from menu. Get input from user, find the records in database and display them.
+        :param dialog: Dialog object that displays Gui in terminal.
+        :return: None
         """
 
-        :param dialog:
-        :return:
-        """
-        code, string = dialog.inputbox('Find')
-        if code != 'ok':
-            return
-        dialog.msgbox('text')
 
-    def menu_add(self, dialog):
-        """
-
-        :param dialog:
-        :return:
-        """
-
-    def menu_delete(self, dialog):
+    def menu_add(self, dialog) -> None:
         """
 
         :param dialog:
         :return:
         """
 
-    def menu_graph(self, dialog):
+    def menu_delete(self, dialog) -> None:
+        """
+
+        :param dialog:
+        :return:
+        """
+
+    def menu_graph(self, dialog) -> None:
         """
 
         :param dialog:
