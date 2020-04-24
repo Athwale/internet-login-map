@@ -2,6 +2,8 @@ import os
 import shutil
 
 from colorama import Fore
+from dialog import Dialog
+from os import system
 
 from Database import Database
 
@@ -44,12 +46,66 @@ def print_record(records):
                         '-' if not content else Fore.LIGHTBLUE_EX + str(content) + Fore.RESET))
 
 
+def menu_find(dialog):
+    """
+
+    :param dialog:
+    :return:
+    """
+    code, string = dialog.inputbox('Find')
+    if code != 'ok':
+        return
+
+
+def menu_add(dialog):
+    """
+
+    :param dialog:
+    :return:
+    """
+
+
+def menu_delete(dialog):
+    """
+
+    :param dialog:
+    :return:
+    """
+
+
+def menu_graph(dialog):
+    """
+
+    :param dialog:
+    :return:
+    """
+
+
 if __name__ == "__main__":
     data = 'data.yml'
     shutil.copyfile(data, 'workCopy.yml')
     database = Database()
     if database.load(os.path.realpath(os.path.join('.', 'workCopy.yml'))):
         print_message('Database OK')
-    new_record = {'newmail@seznam.cz': {'id': 10, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'newmail',
-                                        'notes': None, 'password': 'thepassword', 'question': 'what question?'}}
-    database.graph('graph')
+
+    # Create text based gui
+    d = Dialog(dialog="dialog")
+    while True:
+        selection = d.radiolist("Menu", choices=[('Find', 'Find database records', True),
+                                                 ('Add', 'Add a new record', False),
+                                                 ('Delete', 'Remove database record', False),
+                                                 ('Graph', 'Create database graph', False)])
+        if selection[0] == 'ok':
+            command = selection[1]
+            if command == 'Find':
+                menu_find(d)
+            elif command == 'Add':
+                menu_add(d)
+            elif command == 'Delete':
+                menu_delete(d)
+            else:
+                menu_graph(d)
+        else:
+            break
+    system('clear')
+

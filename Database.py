@@ -337,6 +337,6 @@ class Database:
                             if record[list(record)[0]][link_type]:
                                 for link in record[list(record)[0]][link_type]:
                                     g.edge(list(record)[0], link, color=next(color_generator))
-                        except KeyError as ex:
+                        except KeyError as _:
                             continue
         g.view()
