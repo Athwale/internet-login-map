@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import glob
 import os
 import shutil
 import optparse
@@ -7,15 +7,16 @@ import optparse
 from Database import Database
 from colorama import Fore
 
+from FormatError import FormatError
+
 
 class Cli:
 
-    def __init__(self, database_file):
+    def __init__(self):
         """
         Gui class constructor. Initialize database file name and database object.
-        :param database_file:
         """
-        self._database_file = database_file
+        self._database_file = None
         self._database = Database()
 
         self._parser = optparse.OptionParser('Usage: ./Cli.py  -a | -g | -d ID | -s STRING [-f FILE] \nExamples:\n'
@@ -90,20 +91,37 @@ class Cli:
         :param message:
         :return: None
         """
-        print('## ' + str(message) + '\n')
+        print('## ' + str(message))
 
     def run(self):
         """
-
+        This method begins the user interaction with the database.
         :return:
         """
-        shutil.copyfile(self._database_file, 'workCopy.yml')
-        if self._database.load(os.path.realpath(os.path.join('.', 'workCopy.yml'))):
-            pass
+        work_path = os.path.join('.', 'workDir')
+        if self._options.database_file:
+            self._database_file = self._options.database_file
+        else:
+            yml_files = glob.glob('*.yml')
+            if yml_files:
+                self._database_file = yml_files[0]
+                self.print_message('Using database: ' + str(self._database_file))
+            else:
+                self._parser.error('no database file found in current directory, use -f to specify')
+        if not os.path.exists(work_path) and not os.path.isdir(work_path):
+            os.mkdir(work_path)
+        shutil.copyfile(self._database_file, os.path.join(work_path, 'workCopy.yml'))
+        self.print_message('Creating work copy in: ' + str(os.path.join(work_path, 'workCopy.yml')))
+        try:
+            if self._database.load(os.path.realpath(os.path.join(work_path, 'workCopy.yml'))):
+                self.print_message('Database workCopy.yml load OK')
+        except FormatError as ex:
+            self.print_message('Database error:')
+            print(ex)
 
 
 if __name__ == "__main__":
     data = 'data.yml'
-    cli = Cli(data)
+    cli = Cli()
     cli.run()
 
