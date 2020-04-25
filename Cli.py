@@ -18,8 +18,12 @@ class Cli:
         self._database_file = database_file
         self._database = Database()
 
-        self._parser = optparse.OptionParser(
-            "Usage: ")
+        self._parser = optparse.OptionParser('Usage: ./Cli.py  -a | -g | -d ID | -s STRING [-f FILE] \nExamples:\n'
+                                             './Cli.py -a\n'
+                                             './Cli.py -g\n'
+                                             './Cli.py -d 42\n'
+                                             './Cli.py -s bear\n'
+                                             './Cli.py -s bear -f database.yml')
 
         self._parser.add_option('-a', '--add', default=False,
                                 action="store_true", dest="add_record",
