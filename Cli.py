@@ -56,7 +56,7 @@ class Cli:
             self._parser.error('At least one option is required')
 
     @staticmethod
-    def print_record(records):
+    def print_record(records) -> None:
         """
         Nice print the passed list of records.
         :param records: List of yaml records
@@ -85,18 +85,55 @@ class Cli:
                             '-' if not content else Fore.LIGHTBLUE_EX + str(content) + Fore.RESET))
 
     @staticmethod
-    def print_message(message: str):
+    def print_message(message: str, err: bool) -> None:
         """
         Print a nice looking message on the screen.
         :param message:
+        :param err: True if the message should be an error.
         :return: None
         """
-        print('## ' + str(message))
+        newline = ''
+        # If the message begins with a new line add it before the ##
+        if message[0] == '\n':
+            newline = '\n'
+            message = message[1:]
+        if err:
+            print(Fore.RED + newline + '## ' + str(message) + Fore.RESET)
+        else:
+            print(newline + '## ' + str(message))
 
-    def run(self):
+    def search(self) -> None:
+        """
+        Run database search and print results.
+        :return: None
+        """
+        self.print_message('Searching for: ' + self._options.search_string, False)
+        records = self._database.find(self._options.search_string)
+        self.print_record(records)
+        self.print_message('\nFound: ' + str(len(records)) + ' database records', False)
+
+    def add(self):
+        """
+
+        :return:
+        """
+
+    def delete(self):
+        """
+
+        :return:
+        """
+
+    def graph(self):
+        """
+
+        :return:
+        """
+
+    def run(self) -> None:
         """
         This method begins the user interaction with the database.
-        :return:
+        :return: None
         """
         work_path = os.path.join('.', 'workDir')
         if self._options.database_file:
@@ -105,18 +142,27 @@ class Cli:
             yml_files = glob.glob('*.yml')
             if yml_files:
                 self._database_file = yml_files[0]
-                self.print_message('Using database: ' + str(self._database_file))
+                self.print_message('Using database: ' + str(self._database_file), False)
             else:
                 self._parser.error('no database file found in current directory, use -f to specify')
         if not os.path.exists(work_path) and not os.path.isdir(work_path):
             os.mkdir(work_path)
         shutil.copyfile(self._database_file, os.path.join(work_path, 'workCopy.yml'))
-        self.print_message('Creating work copy in: ' + str(os.path.join(work_path, 'workCopy.yml')))
+        self.print_message('Creating work copy in: ' + str(os.path.join(work_path, 'workCopy.yml')), False)
         try:
             if self._database.load(os.path.realpath(os.path.join(work_path, 'workCopy.yml'))):
-                self.print_message('Database workCopy.yml load OK')
+                self.print_message('Database workCopy.yml load OK', False)
+
+            if self._options.add_record:
+                self.add()
+            elif self._options.delete_id:
+                self.delete()
+            elif self._options.search_string:
+                self.search()
+            else:
+                self.graph()
         except FormatError as ex:
-            self.print_message('Database error:')
+            self.print_message('Database error:', True)
             print(ex)
 
 
