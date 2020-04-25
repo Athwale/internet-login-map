@@ -124,11 +124,21 @@ class Cli:
         :return:
         """
 
-    def graph(self):
+    def graph(self) -> None:
         """
-
-        :return:
+        Create a graph of the database. Back up old version of the graph if exists in the directory.
+        :return: None
         """
+        self.print_message('Creating database graph', False)
+        # Rename previous graph
+        file_path = os.path.join('.', 'graph.pdf')
+        if os.path.exists(file_path):
+            self.print_message('Backing up previous graph', False)
+            os.rename(file_path, os.path.join('.', 'graph.old.pdf'))
+        self._database.graph('graph')
+        # Remove intermediate file
+        os.remove(os.path.join('.', 'graph'))
+        self.print_message('Graph saved: ' + str(os.path.join('.', 'graph.pdf')), False)
 
     def run(self) -> None:
         """

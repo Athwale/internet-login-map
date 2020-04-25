@@ -291,7 +291,7 @@ class Database:
         :return: str, graphviz color name
         """
         color_list = ['blue', 'chartreuse', 'crimson', 'gold3', 'black', 'cyan', 'magenta', 'navyblue', 'palegreen1',
-                      'red', 'green', 'dimgray', 'sienna', 'indianred', 'teal']
+                      'red', 'green', 'dimgray', 'sienna', 'indianred']
         while True:
             for color in color_list:
                 yield color
