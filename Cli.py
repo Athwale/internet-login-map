@@ -23,7 +23,7 @@ class Cli:
                                              './Cli.py -a\n'
                                              './Cli.py -g\n'
                                              './Cli.py -d 42\n'
-                                             './Cli.py -s bear\n'
+                                             './Cli.py -s [bear]\n'
                                              './Cli.py -s bear -f database.yml')
 
         self._parser.add_option('-a', '--add', default=False,
@@ -118,11 +118,20 @@ class Cli:
         :return:
         """
 
-    def delete(self):
+    def delete(self) -> None:
         """
-
-        :return:
+        Remove a record from database based on ID. Get input from the user.
+        :return: None
         """
+        self.print_message('\nRemove record ID: ' + str(self._options.delete_id) + ':', False)
+        record = self._database.find_id(int(self._options.delete_id))
+        self.print_record([record])
+        if self.confirm():
+            self.print_message('Removing', False)
+            if self._database.delete(int(self._options.delete_id)):
+                self.print_message('Record deleted, database saved', False)
+        else:
+            self.print_message('Deletion canceled', False)
 
     def graph(self) -> None:
         """
@@ -139,6 +148,20 @@ class Cli:
         # Remove intermediate file
         os.remove(os.path.join('.', 'graph'))
         self.print_message('Graph saved: ' + str(os.path.join('.', 'graph.pdf')), False)
+
+    @staticmethod
+    def confirm() -> bool:
+        """
+        Ask the user for confirmation, return True of False.
+        :return: True if the user answered yes.
+        """
+        answer = None
+        while answer not in ['y', 'Y', 'n', 'N']:
+            answer = str(input('Are you sure? [y/n]: '))
+            if answer in ['y', 'Y']:
+                return True
+            if answer in ['n', 'N']:
+                return False
 
     def run(self) -> None:
         """

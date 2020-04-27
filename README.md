@@ -2,4 +2,5 @@
 Website login database capable of drawing a graph of user's presence on the net.
 
 TODO:
-Watch out for exceptions in GUI
+When removing, remove all mentions also
+Replace original database when save successful

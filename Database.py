@@ -182,6 +182,22 @@ class Database:
         if item_key not in found_keys:
             dict_list.append(item)
 
+    def find_id(self, record_id: int):
+        """
+        Return the record with the ID from the parameter.
+        :param record_id: int id of the record to be found
+        :return: The record with the id.
+        """
+        with open(self._database_file, "r") as yml:
+            data = yaml.safe_load(yml)
+            # Go through everything looking for the id
+            for section in ['emails', 'websites', 'companies']:
+                for record in data[section]:
+                    data_dict = record[list(record)[0]]
+                    if data_dict['id'] == record_id:
+                        return record
+            raise FormatError(self.DATABASE_ERROR + 'record: ' + str(record_id) + ' not found')
+
     def find(self, string: str):
         """
         Find records in database that contain the string. Go through all records and look for the string.
