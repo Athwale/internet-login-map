@@ -21,6 +21,7 @@ class Cli:
         """
         self._database_file = None
         self._database = Database()
+        self.work_path = os.path.join('.', 'workDir')
 
         self._parser = optparse.OptionParser('Usage: ./Cli.py  -a | -g | -d ID | -s STRING [-f FILE] \nExamples:\n'
                                              './Cli.py -a\n'
@@ -135,6 +136,10 @@ class Cli:
             self.print_message('Removing', Cli.MESSAGE_NORMAL)
             if self._database.delete(int(self._options.delete_id)):
                 self.print_message('Record deleted, database saved', Cli.MESSAGE_IMP)
+                if self._replace_database():
+                    self.print_message(str(self._database_file + ' replaced successfully'), Cli.MESSAGE_IMP)
+                else:
+                    self.print_message('Error replacing database', cli.MESSAGE_ERR)
         else:
             self.print_message('Deletion canceled', Cli.MESSAGE_IMP)
 
@@ -153,6 +158,14 @@ class Cli:
         # Remove intermediate file
         os.remove(os.path.join('.', 'graph'))
         self.print_message('Graph saved: ' + str(os.path.join('.', 'graph.pdf')), Cli.MESSAGE_IMP)
+
+    def _replace_database(self) -> bool:
+        """
+        Replace original database file with the valid workingCopy database after transactions.
+        :return: True if replaced successfully.
+        """
+        os.replace(os.path.join(self.work_path, 'workCopy.yml'), os.path.join('.', self._database_file))
+        return True
 
     @staticmethod
     def confirm() -> bool:
@@ -173,7 +186,6 @@ class Cli:
         This method begins the user interaction with the database.
         :return: None
         """
-        work_path = os.path.join('.', 'workDir')
         if self._options.database_file:
             self._database_file = self._options.database_file
         else:
@@ -183,12 +195,12 @@ class Cli:
                 self.print_message('Using database: ' + str(self._database_file), Cli.MESSAGE_IMP)
             else:
                 self._parser.error('no database file found in current directory, use -f to specify')
-        if not os.path.exists(work_path) and not os.path.isdir(work_path):
-            os.mkdir(work_path)
-        shutil.copyfile(self._database_file, os.path.join(work_path, 'workCopy.yml'))
-        self.print_message('Creating work copy in: ' + str(os.path.join(work_path, 'workCopy.yml')), False)
+        if not os.path.exists(self.work_path) and not os.path.isdir(self.work_path):
+            os.mkdir(self.work_path)
+        shutil.copyfile(self._database_file, os.path.join(self.work_path, 'workCopy.yml'))
+        self.print_message('Creating work copy in: ' + str(os.path.join(self.work_path, 'workCopy.yml')), False)
         try:
-            if self._database.load(os.path.realpath(os.path.join(work_path, 'workCopy.yml'))):
+            if self._database.load(os.path.realpath(os.path.join(self.work_path, 'workCopy.yml'))):
                 self.print_message('Database workCopy.yml load OK', Cli.MESSAGE_IMP)
 
             if self._options.add_record:
