@@ -267,7 +267,19 @@ class Database:
                 for record in data[section]:
                     data_dict = record[list(record)[0]]
                     if data_dict['id'] == record_id:
+                        record_name = list(record)[0]
                         del data[section][data[section].index(record)]
+                        # Find all occurrences of the record name and remove them
+                        for group in ['emails', 'websites', 'companies']:
+                            for item in data[group]:
+                                data_dict = item[list(item)[0]]
+                                for kind in ['linkto', 'email']:
+                                    if kind in data_dict.keys() and data_dict[kind]:
+                                        if record_name in data_dict[kind]:
+                                            data_dict[kind].remove(record_name)
+                                            # Do not leave empty lists in the yaml
+                                            if not data_dict[kind]:
+                                                data_dict[kind] = None
                         return self.save(data)
             raise FormatError(self.DATABASE_ERROR + 'record: ' + str(record_id) + ' not found')
 

@@ -11,6 +11,9 @@ from FormatError import FormatError
 
 
 class Cli:
+    MESSAGE_NORMAL = 0
+    MESSAGE_IMP = 1
+    MESSAGE_ERR = 2
 
     def __init__(self):
         """
@@ -85,11 +88,11 @@ class Cli:
                             '-' if not content else Fore.LIGHTBLUE_EX + str(content) + Fore.RESET))
 
     @staticmethod
-    def print_message(message: str, err: bool) -> None:
+    def print_message(message: str, kind: int) -> None:
         """
         Print a nice looking message on the screen.
         :param message:
-        :param err: True if the message should be an error.
+        :param kind: One of MESSAGE_NORMAL,IMP,ERR if the message should be an error, normal or important.
         :return: None
         """
         newline = ''
@@ -97,8 +100,10 @@ class Cli:
         if message[0] == '\n':
             newline = '\n'
             message = message[1:]
-        if err:
+        if kind == Cli.MESSAGE_ERR:
             print(Fore.RED + newline + '## ' + str(message) + Fore.RESET)
+        elif kind == Cli.MESSAGE_IMP:
+            print(Fore.CYAN + newline + '## ' + str(message) + Fore.RESET)
         else:
             print(newline + '## ' + str(message))
 
@@ -107,10 +112,10 @@ class Cli:
         Run database search and print results.
         :return: None
         """
-        self.print_message('Searching for: ' + self._options.search_string, False)
+        self.print_message('Searching for: ' + self._options.search_string, Cli.MESSAGE_IMP)
         records = self._database.find(self._options.search_string)
         self.print_record(records)
-        self.print_message('\nFound: ' + str(len(records)) + ' database records', False)
+        self.print_message('\nFound: ' + str(len(records)) + ' database records', Cli.MESSAGE_IMP)
 
     def add(self):
         """
@@ -123,31 +128,31 @@ class Cli:
         Remove a record from database based on ID. Get input from the user.
         :return: None
         """
-        self.print_message('\nRemove record ID: ' + str(self._options.delete_id) + ':', False)
+        self.print_message('\nRemove record ID: ' + str(self._options.delete_id) + ':', Cli.MESSAGE_IMP)
         record = self._database.find_id(int(self._options.delete_id))
         self.print_record([record])
         if self.confirm():
-            self.print_message('Removing', False)
+            self.print_message('Removing', Cli.MESSAGE_NORMAL)
             if self._database.delete(int(self._options.delete_id)):
-                self.print_message('Record deleted, database saved', False)
+                self.print_message('Record deleted, database saved', Cli.MESSAGE_IMP)
         else:
-            self.print_message('Deletion canceled', False)
+            self.print_message('Deletion canceled', Cli.MESSAGE_IMP)
 
     def graph(self) -> None:
         """
         Create a graph of the database. Back up old version of the graph if exists in the directory.
         :return: None
         """
-        self.print_message('Creating database graph', False)
+        self.print_message('Creating database graph', Cli.MESSAGE_IMP)
         # Rename previous graph
         file_path = os.path.join('.', 'graph.pdf')
         if os.path.exists(file_path):
-            self.print_message('Backing up previous graph', False)
+            self.print_message('Backing up previous graph', Cli.MESSAGE_IMP)
             os.rename(file_path, os.path.join('.', 'graph.old.pdf'))
         self._database.graph('graph')
         # Remove intermediate file
         os.remove(os.path.join('.', 'graph'))
-        self.print_message('Graph saved: ' + str(os.path.join('.', 'graph.pdf')), False)
+        self.print_message('Graph saved: ' + str(os.path.join('.', 'graph.pdf')), Cli.MESSAGE_IMP)
 
     @staticmethod
     def confirm() -> bool:
@@ -157,7 +162,7 @@ class Cli:
         """
         answer = None
         while answer not in ['y', 'Y', 'n', 'N']:
-            answer = str(input('Are you sure? [y/n]: '))
+            answer = str(input('\nAre you sure? [y/n]: '))
             if answer in ['y', 'Y']:
                 return True
             if answer in ['n', 'N']:
@@ -175,7 +180,7 @@ class Cli:
             yml_files = glob.glob('*.yml')
             if yml_files:
                 self._database_file = yml_files[0]
-                self.print_message('Using database: ' + str(self._database_file), False)
+                self.print_message('Using database: ' + str(self._database_file), Cli.MESSAGE_IMP)
             else:
                 self._parser.error('no database file found in current directory, use -f to specify')
         if not os.path.exists(work_path) and not os.path.isdir(work_path):
@@ -184,7 +189,7 @@ class Cli:
         self.print_message('Creating work copy in: ' + str(os.path.join(work_path, 'workCopy.yml')), False)
         try:
             if self._database.load(os.path.realpath(os.path.join(work_path, 'workCopy.yml'))):
-                self.print_message('Database workCopy.yml load OK', False)
+                self.print_message('Database workCopy.yml load OK', Cli.MESSAGE_IMP)
 
             if self._options.add_record:
                 self.add()
@@ -195,7 +200,7 @@ class Cli:
             else:
                 self.graph()
         except FormatError as ex:
-            self.print_message('Database error:', True)
+            self.print_message('Database error:', Cli.MESSAGE_ERR)
             print(ex)
 
 
@@ -203,4 +208,3 @@ if __name__ == "__main__":
     data = 'data.yml'
     cli = Cli()
     cli.run()
-
