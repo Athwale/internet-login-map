@@ -3,6 +3,7 @@ import glob
 import os
 import shutil
 import optparse
+import re
 
 from Database import Database
 from colorama import Fore
@@ -118,11 +119,40 @@ class Cli:
         self.print_record(records)
         self.print_message('\nFound: ' + str(len(records)) + ' database records', Cli.MESSAGE_IMP)
 
-    def add(self):
+    def add(self) -> None:
         """
+        Add a new record into the database, ask the user for details.
+        :return: None
+        """
+        record_id = self._database.get_new_id()
+        self.print_message('\nAdd new record ID: ' + str(record_id), Cli.MESSAGE_IMP)
+        self.print_message('Select category:', Cli.MESSAGE_IMP)
+        print('Email -> "e"')
+        print('Website -> "w')
+        print('Company -> "c"')
+        selection = None
+        while selection not in ['e', 'w', 'c']:
+            selection = str(input('Category [e/w/c]: '))
 
-        :return:
-        """
+        # Add an e-mail
+        if selection == 'e':
+            self.print_message('\nAdding a new e-mail', Cli.MESSAGE_IMP)
+            email = ''
+            while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                email = str(input('Address: '))
+            login = email.split('@')[0]
+            password = ''
+            while re.match(r"^$|\s+", password):
+                password = str(input('Password: '))
+            question = ''
+
+        # Add a website
+        if selection == 'w':
+            pass
+
+        # Add a company
+        if selection == 'c':
+            pass
 
     def delete(self) -> None:
         """
@@ -174,8 +204,9 @@ class Cli:
         :return: True if the user answered yes.
         """
         answer = None
+        print()
         while answer not in ['y', 'Y', 'n', 'N']:
-            answer = str(input('\nAre you sure? [y/n]: '))
+            answer = str(input('Are you sure? [y/n]: '))
             if answer in ['y', 'Y']:
                 return True
             if answer in ['n', 'N']:
