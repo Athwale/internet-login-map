@@ -4,6 +4,7 @@ import os
 import shutil
 import optparse
 import re
+from typing import List
 
 from Database import Database
 from colorama import Fore
@@ -119,6 +120,17 @@ class Cli:
         self.print_record(records)
         self.print_message('\nFound: ' + str(len(records)) + ' database records', Cli.MESSAGE_IMP)
 
+    def _get_linkto(self) -> List[str]:
+        """
+        Return a list of linkto database records, ask the user to provide them.
+        :return: Return a list of linkto database records, ask the user to provide them.
+        """
+        link_list = []
+        print('This account links to:')
+        while self.confirm('Add another?'):
+            link_list.append(str(input('Record: ')).lstrip().rstrip())
+        return link_list
+
     def add(self) -> None:
         """
         Add a new record into the database, ask the user for details.
@@ -139,12 +151,19 @@ class Cli:
             self.print_message('\nAdding a new e-mail', Cli.MESSAGE_IMP)
             email = ''
             while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                email = str(input('Address: '))
+                email = str(input('Address: ')).lstrip().rstrip()
             login = email.split('@')[0]
             password = ''
-            while re.match(r"^$|\s+", password):
-                password = str(input('Password: '))
-            question = ''
+            while not password:
+                password = str(input('Password: ')).lstrip().rstrip()
+            question = str(input('Security question: ')).lstrip().rstrip()
+            linktos = self._get_linkto()
+            notes = str(input('Additional notes: ')).lstrip().rstrip()
+            self.print_message('\nSaving new record', Cli.MESSAGE_IMP)
+            new_record = []
+            if self._database.add('emails', new_record):
+                self.print_message('Record added, database saved', Cli.MESSAGE_IMP)
+
 
         # Add a website
         if selection == 'w':
@@ -162,13 +181,11 @@ class Cli:
         self.print_message('\nRemove record ID: ' + str(self._options.delete_id) + ':', Cli.MESSAGE_IMP)
         record = self._database.find_id(int(self._options.delete_id))
         self.print_record([record])
-        if self.confirm():
+        if self.confirm('\n Are you sure?'):
             self.print_message('Removing', Cli.MESSAGE_NORMAL)
             if self._database.delete(int(self._options.delete_id)):
                 self.print_message('Record deleted, database saved', Cli.MESSAGE_IMP)
-                if self._replace_database():
-                    self.print_message(str(self._database_file + ' replaced successfully'), Cli.MESSAGE_IMP)
-                else:
+                if not self._replace_database():
                     self.print_message('Error replacing database', cli.MESSAGE_ERR)
         else:
             self.print_message('Deletion canceled', Cli.MESSAGE_IMP)
@@ -195,18 +212,19 @@ class Cli:
         :return: True if replaced successfully.
         """
         os.replace(os.path.join(self.work_path, 'workCopy.yml'), os.path.join('.', self._database_file))
+        self.print_message(str(self._database_file + ' replaced successfully'), Cli.MESSAGE_IMP)
         return True
 
     @staticmethod
-    def confirm() -> bool:
+    def confirm(prompt: str) -> bool:
         """
         Ask the user for confirmation, return True of False.
+        :param prompt: str, Display this prompt.
         :return: True if the user answered yes.
         """
         answer = None
-        print()
         while answer not in ['y', 'Y', 'n', 'N']:
-            answer = str(input('Are you sure? [y/n]: '))
+            answer = str(input(prompt + ' [y/n]: '))
             if answer in ['y', 'Y']:
                 return True
             if answer in ['n', 'N']:
