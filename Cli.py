@@ -160,10 +160,14 @@ class Cli:
             linktos = self._get_linkto()
             notes = str(input('Additional notes: ')).lstrip().rstrip()
             self.print_message('\nSaving new record', Cli.MESSAGE_IMP)
-            new_record = []
+            # Record example
+            # {'whitebear@volny.cz': {'id': 3, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'whitebear',
+            # 'notes': None, 'password': 'thepassword', 'question': 'what question?'}}
+            new_record = {email: {'id': record_id, 'linkto': (linktos if linktos else None), 'login': login,
+                                  'notes': (notes if notes else None), 'password': password,
+                                  'question': (question if question else None)}}
             if self._database.add('emails', new_record):
                 self.print_message('Record added, database saved', Cli.MESSAGE_IMP)
-
 
         # Add a website
         if selection == 'w':
@@ -172,6 +176,10 @@ class Cli:
         # Add a company
         if selection == 'c':
             pass
+
+        # Save to disk and replace
+        if not self._replace_database():
+            self.print_message('Error replacing database', cli.MESSAGE_ERR)
 
     def delete(self) -> None:
         """
