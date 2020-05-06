@@ -131,6 +131,36 @@ class Cli:
             link_list.append(str(input('Record: ')).lstrip().rstrip())
         return link_list
 
+    @staticmethod
+    def _get_email() -> str:
+        """
+        Ask the user for a valid e-mail address and return it.
+        :return: str, a valid e-mail address.
+        """
+        email = ''
+        while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            email = str(input('Address: ')).lstrip().rstrip()
+        return email
+
+    @staticmethod
+    def _get_password() -> str:
+        """
+        Ask the user for a valid password and return it.
+        :return: str, a valid password.
+        """
+        password = ''
+        while not password:
+            password = str(input('Password: ')).lstrip().rstrip()
+        return password
+
+    @staticmethod
+    def _get_simple_attribute(attribute: str) -> str:
+        """
+        Ask the user for an attribute and return it.
+        :return: str, the attribute from user.
+        """
+        return str(input(attribute + ': ')).lstrip().rstrip()
+
     def add(self) -> None:
         """
         Add a new record into the database, ask the user for details.
@@ -149,16 +179,12 @@ class Cli:
         # Add an e-mail
         if selection == 'e':
             self.print_message('\nAdding a new e-mail', Cli.MESSAGE_IMP)
-            email = ''
-            while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                email = str(input('Address: ')).lstrip().rstrip()
+            email = self._get_email()
             login = email.split('@')[0]
-            password = ''
-            while not password:
-                password = str(input('Password: ')).lstrip().rstrip()
-            question = str(input('Security question: ')).lstrip().rstrip()
+            password = self._get_password()
+            question = self._get_simple_attribute('Security question')
             linktos = self._get_linkto()
-            notes = str(input('Additional notes: ')).lstrip().rstrip()
+            notes = self._get_simple_attribute('Additional notes')
             self.print_message('\nSaving new record', Cli.MESSAGE_IMP)
             # Record example
             # {'whitebear@volny.cz': {'id': 3, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'whitebear',
