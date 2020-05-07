@@ -148,17 +148,6 @@ class Cli:
         return email
 
     @staticmethod
-    def _get_password() -> str:
-        """
-        Ask the user for a valid password and return it.
-        :return: str, a valid password.
-        """
-        password = ''
-        while not password:
-            password = str(input('Password: ')).lstrip().rstrip()
-        return password
-
-    @staticmethod
     def _get_simple_attribute(name: str, empty: bool) -> str:
         """
         Ask the user for an attribute and return it.
@@ -172,6 +161,16 @@ class Cli:
             if empty:
                 return attribute
         return attribute
+
+    def _get_web_address(self) -> str:
+        """
+        Ask the user for a valid website address and return it.
+        :return: Valid website address.
+        """
+        address = ''
+        while not address.startswith('www.'):
+            address = self._get_simple_attribute('Website address', False)
+        return address
 
     def add(self) -> None:
         """
@@ -193,7 +192,7 @@ class Cli:
             self.print_message('\nAdding a new e-mail', Cli.MESSAGE_IMP)
             email = self._get_email()
             login = email.split('@')[0]
-            password = self._get_password()
+            password = self._get_simple_attribute('Password', False)
             question = self._get_simple_attribute('Security question', True)
             linktos = self._get_linkto(True)
             notes = self._get_simple_attribute('Additional notes', True)
@@ -210,9 +209,9 @@ class Cli:
         # Add a website
         if selection == 'w':
             self.print_message('\nAdding a new website', Cli.MESSAGE_IMP)
-            web_name = self._get_simple_attribute('Website address', False)
-            login = self._get_simple_attribute('Login', True)
-            password = self._get_password()
+            web_name = self._get_web_address()
+            login = self._get_simple_attribute('Login', False)
+            password = self._get_simple_attribute('Password', False)
             question = self._get_simple_attribute('Security question', True)
             emails = self._get_linkto(False)
             linktos = self._get_linkto(True)
