@@ -69,6 +69,7 @@ class Cli:
         :return: None
         """
         for record in records:
+            print(record)
             for name, values in record.items():
                 print('\n' + Fore.GREEN + str(name) + Fore.RESET)
                 for attribute, content in values.items():
@@ -120,13 +121,17 @@ class Cli:
         self.print_record(records)
         self.print_message('\nFound: ' + str(len(records)) + ' database records', Cli.MESSAGE_IMP)
 
-    def _get_linkto(self) -> List[str]:
+    def _get_linkto(self, kind: bool) -> List[str]:
         """
         Return a list of linkto database records, ask the user to provide them.
+        :param kind: True if link, False if email.
         :return: Return a list of linkto database records, ask the user to provide them.
         """
         link_list = []
-        print('This account links to:')
+        if kind:
+            print('This account links to:')
+        else:
+            print('Associated e-mail addresses:')
         while self.confirm('Add another?'):
             link_list.append(str(input('Record: ')).lstrip().rstrip())
         return link_list
@@ -154,12 +159,19 @@ class Cli:
         return password
 
     @staticmethod
-    def _get_simple_attribute(attribute: str) -> str:
+    def _get_simple_attribute(name: str, empty: bool) -> str:
         """
         Ask the user for an attribute and return it.
+        :param name: The name of the attribute to get
+        :param empty: Can it be empty?
         :return: str, the attribute from user.
         """
-        return str(input(attribute + ': ')).lstrip().rstrip()
+        attribute = ''
+        while not attribute:
+            attribute = str(input(name + ': ')).lstrip().rstrip()
+            if empty:
+                return attribute
+        return attribute
 
     def add(self) -> None:
         """
@@ -182,10 +194,10 @@ class Cli:
             email = self._get_email()
             login = email.split('@')[0]
             password = self._get_password()
-            question = self._get_simple_attribute('Security question')
-            linktos = self._get_linkto()
-            notes = self._get_simple_attribute('Additional notes')
-            self.print_message('\nSaving new record', Cli.MESSAGE_IMP)
+            question = self._get_simple_attribute('Security question', True)
+            linktos = self._get_linkto(True)
+            notes = self._get_simple_attribute('Additional notes', True)
+            self.print_message('\nSaving new e-mail record', Cli.MESSAGE_IMP)
             # Record example
             # {'whitebear@volny.cz': {'id': 3, 'linkto': ['bear@gmail.com', 'white@gmail.com'], 'login': 'whitebear',
             # 'notes': None, 'password': 'thepassword', 'question': 'what question?'}}
@@ -197,7 +209,24 @@ class Cli:
 
         # Add a website
         if selection == 'w':
-            pass
+            self.print_message('\nAdding a new website', Cli.MESSAGE_IMP)
+            web_name = self._get_simple_attribute('Website address', False)
+            login = self._get_simple_attribute('Login', True)
+            password = self._get_password()
+            question = self._get_simple_attribute('Security question', True)
+            emails = self._get_linkto(False)
+            linktos = self._get_linkto(True)
+            notes = self._get_simple_attribute('Additional notes', True)
+            self.print_message('\nSaving new website record', Cli.MESSAGE_IMP)
+            # Record example
+            # {'www.github.com': {'email': ['white@gmail.com'], 'id': 5, 'linkto': None, 'login': 'athwale',
+            # 'notes': None, 'password': 'probablyisnt', 'question': 'dog'}}
+            new_record = {web_name: {'email': (emails if emails else None), 'id': record_id,
+                                     'linkto': (linktos if linktos else None), 'login': login,
+                                     'notes': (notes if notes else None), 'password': password,
+                                     'question': (question if question else None)}}
+            if self._database.add('websites', new_record):
+                self.print_message('Record added, database saved', Cli.MESSAGE_IMP)
 
         # Add a company
         if selection == 'c':
