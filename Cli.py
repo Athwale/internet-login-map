@@ -69,10 +69,12 @@ class Cli:
         :return: None
         """
         for record in records:
-            print(record)
             for name, values in record.items():
                 print('\n' + Fore.GREEN + str(name) + Fore.RESET)
+                print('\t' + 'id: ' + Fore.LIGHTBLUE_EX + str(values['id']) + Fore.RESET)
                 for attribute, content in values.items():
+                    if attribute == 'id':
+                        continue
                     if attribute in ['email', 'linkto']:
                         if attribute == 'email':
                             if content:
