@@ -25,12 +25,13 @@ class Cli:
         self._database = Database()
         self.work_path = os.path.join('.', 'workDir')
 
-        self._parser = optparse.OptionParser('Usage: ./Cli.py  -a | -g | -d ID | -s STRING [-f FILE] \nExamples:\n'
+        self._parser = optparse.OptionParser('Usage: ./Cli.py  -a | -g | -l | -d ID | -s STRING [-f FILE] \nExamples:\n'
                                              './Cli.py -a\n'
                                              './Cli.py -g\n'
                                              './Cli.py -d 42\n'
-                                             './Cli.py -s [bear]\n'
-                                             './Cli.py -s bear -f database.yml')
+                                             './Cli.py -s bear\n'
+                                             './Cli.py -s bear -f database.yml\n'
+                                             './Cli.py -l')
 
         self._parser.add_option('-a', '--add', default=False,
                                 action="store_true", dest="add_record",
@@ -48,13 +49,17 @@ class Cli:
                                 action="store_true", dest="make_graph",
                                 help="Create a graph of the database")
 
+        self._parser.add_option('-l', '--list', default=False,
+                                action="store_true", dest="list_all",
+                                help="List all records in database")
+
         self._parser.add_option('-s', '--search', type='string',
                                 action="store", dest="search_string",
                                 help="Search for this string in the database, if empty all records are printed")
 
         self._options, _ = self._parser.parse_args()
         option_combination = [self._options.add_record, self._options.delete_id,
-                              self._options.make_graph, self._options.search_string]
+                              self._options.make_graph, self._options.search_string, self._options.list_all]
         option_combination = [1 for o in option_combination if o]
         if len(option_combination) > 1:
             self._parser.error('Only one option can be used at a time')
@@ -122,6 +127,16 @@ class Cli:
         records = self._database.find(self._options.search_string)
         self.print_record(records)
         self.print_message('\nFound: ' + str(len(records)) + ' database records', Cli.MESSAGE_IMP)
+
+    def _list_all(self) -> None:
+        """
+        List all records in the database.
+        :return: None
+        """
+        self.print_message('List all records', Cli.MESSAGE_IMP)
+        records = self._database.find('')
+        self.print_record(records)
+        self.print_message('\nDatabase contains: ' + str(len(records)) + ' records', Cli.MESSAGE_IMP)
 
     def _get_linkto(self, kind: bool) -> List[str]:
         """
@@ -334,6 +349,8 @@ class Cli:
                 self.delete()
             elif self._options.search_string:
                 self.search()
+            elif self._options.list_all:
+                self._list_all()
             else:
                 self.graph()
         except FormatError as ex:
