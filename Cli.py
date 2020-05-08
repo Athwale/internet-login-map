@@ -4,6 +4,7 @@ import os
 import shutil
 import optparse
 import re
+import sys
 from typing import List
 
 from Database import Database
@@ -262,7 +263,7 @@ class Cli:
 
         # Save to disk and replace
         if not self._replace_database():
-            self.print_message('Error replacing database', cli.MESSAGE_ERR)
+            raise FormatError('Error replacing database')
 
     def delete(self) -> None:
         """
@@ -277,7 +278,7 @@ class Cli:
             if self._database.delete(int(self._options.delete_id)):
                 self.print_message('Record deleted, database saved', Cli.MESSAGE_IMP)
                 if not self._replace_database():
-                    self.print_message('Error replacing database', cli.MESSAGE_ERR)
+                    raise FormatError('Error replacing database')
         else:
             self.print_message('Deletion canceled', Cli.MESSAGE_IMP)
 
@@ -334,7 +335,8 @@ class Cli:
                 self._database_file = yml_files[0]
                 self.print_message('Using database: ' + str(self._database_file), Cli.MESSAGE_IMP)
             else:
-                self._parser.error('no database file found in current directory, use -f to specify')
+                self._parser.error('no database file found in current directory, use -f to specify '
+                                   'or create an empty .yml file')
         if not os.path.exists(self.work_path) and not os.path.isdir(self.work_path):
             os.mkdir(self.work_path)
         try:
@@ -344,6 +346,8 @@ class Cli:
             self.print_message('Creating work copy in: ' + str(os.path.join(self.work_path, 'workCopy.yml')), False)
             if self._database.load(os.path.realpath(os.path.join(self.work_path, 'workCopy.yml'))):
                 self.print_message('Database workCopy.yml load OK', Cli.MESSAGE_IMP)
+            else:
+                self._parser.error('Incorrect database file')
 
             if self._options.add_record:
                 self.add()
@@ -357,7 +361,7 @@ class Cli:
                 self.graph()
         except FormatError as ex:
             self.print_message('Database error:', Cli.MESSAGE_ERR)
-            print(ex)
+            print(ex, file=sys.stderr)
 
 
 if __name__ == "__main__":
