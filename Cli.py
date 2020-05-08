@@ -152,7 +152,7 @@ class Cli:
         """
         Ask the user for an attribute and return it.
         :param name: The name of the attribute to get
-        :param empty: Can it be empty?
+        :param empty: Can it be empty, True if it can?
         :return: str, the attribute from user.
         """
         attribute = ''
@@ -229,7 +229,19 @@ class Cli:
 
         # Add a company
         if selection == 'c':
-            pass
+            self.print_message('\nAdding a new company', Cli.MESSAGE_IMP)
+            company_name = self._get_simple_attribute('Company name', False)
+            emails = self._get_linkto(False)
+            linktos = self._get_linkto(True)
+            notes = self._get_simple_attribute('Additional notes', True)
+            self.print_message('\nSaving new company record', Cli.MESSAGE_IMP)
+            # Record example
+            # {'Zoo': {'email': [], 'id': 9, 'linkto': [], 'notes': None}}
+            new_record = {company_name: {'email': (emails if emails else None), 'id': record_id,
+                                         'linkto': (linktos if linktos else None),
+                                         'notes': (notes if notes else None)}}
+            if self._database.add('companies', new_record):
+                self.print_message('Record added, database saved', Cli.MESSAGE_IMP)
 
         # Save to disk and replace
         if not self._replace_database():
