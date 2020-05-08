@@ -337,9 +337,11 @@ class Cli:
                 self._parser.error('no database file found in current directory, use -f to specify')
         if not os.path.exists(self.work_path) and not os.path.isdir(self.work_path):
             os.mkdir(self.work_path)
-        shutil.copyfile(self._database_file, os.path.join(self.work_path, 'workCopy.yml'))
-        self.print_message('Creating work copy in: ' + str(os.path.join(self.work_path, 'workCopy.yml')), False)
         try:
+            if not os.path.exists(self._database_file):
+                raise FormatError('Database file: ' + str(self._database_file) + ' does not exist')
+            shutil.copyfile(self._database_file, os.path.join(self.work_path, 'workCopy.yml'))
+            self.print_message('Creating work copy in: ' + str(os.path.join(self.work_path, 'workCopy.yml')), False)
             if self._database.load(os.path.realpath(os.path.join(self.work_path, 'workCopy.yml'))):
                 self.print_message('Database workCopy.yml load OK', Cli.MESSAGE_IMP)
 
