@@ -203,6 +203,8 @@ class Database:
         """
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
+            if not data:
+                raise FormatError(self.DATABASE_ERROR + 'Database is empty')
             # Go through everything looking for the id
             for section in data.keys():
                 for record in data[section]:
@@ -221,6 +223,8 @@ class Database:
         string = string.lower()
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
+            if not data:
+                raise FormatError(self.DATABASE_ERROR + 'Database is empty')
             # Check main sections
             for section in data.keys():
                 for record in data[section]:
