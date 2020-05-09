@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 import glob
-import os
-import shutil
 import optparse
+import os
 import re
+import shutil
 import sys
 from typing import List
 
-from Database import Database
 from colorama import Fore
 
+from Database import Database
 from FormatError import FormatError
 
 
@@ -362,6 +362,7 @@ class Cli:
         except FormatError as ex:
             self.print_message('Database error:', Cli.MESSAGE_ERR)
             print(ex, file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == "__main__":

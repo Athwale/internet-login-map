@@ -1,7 +1,8 @@
 from typing import List
-from graphviz import Digraph
 
 import yaml
+from graphviz import Digraph
+from yaml.scanner import ScannerError
 
 from FormatError import FormatError
 
@@ -41,7 +42,6 @@ class Database:
         :param data: Loaded yaml database.
         :return: bool True if validation passed, exception FormatError is thrown otherwise.
         """
-        missing_counter = 0
         self._id_list.clear()
         # Check mail section
         # Check that each email has an id. Check that each email has @ and . in it. Check that each email record has
@@ -67,8 +67,6 @@ class Database:
                     # Check that linkto points to an existing record
                     if values['linkto']:
                         self._linkto_check(data, values['linkto'], address)
-        else:
-            missing_counter += 1
 
         # Check website section
         # Check that website begins with www and contains a dot. Check that each website record has required
@@ -100,8 +98,6 @@ class Database:
                     # Check that each linkto point to an existing record
                     if values['linkto']:
                         self._linkto_check(data, values['linkto'], web_address)
-        else:
-            missing_counter += 1
 
         # Check company section
         # Check that each company record has required attributes. Check that each linkto/email attribute points to
@@ -121,11 +117,6 @@ class Database:
                     # Check that each linkto point to an existing record
                     if values['linkto']:
                         self._linkto_check(data, values['linkto'], company_name)
-        else:
-            missing_counter += 1
-
-        if missing_counter == 3:
-            return False
         return True
 
     def _id_check(self, values, source: str) -> None:
@@ -266,6 +257,9 @@ class Database:
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             if kind in ['emails', 'websites', 'companies']:
+                # Database empty, create it
+                if not data:
+                    data = {}
                 # Add section if missing from database
                 if kind not in data.keys():
                     data[kind] = []
@@ -327,11 +321,11 @@ class Database:
         :return: True if opening and validating succeeded.
         """
         self._database_file = file
-        with open(self._database_file, "r") as yml:
-            data = yaml.safe_load(yml)
-            # Empty file
-            if not data:
-                raise FormatError(self.DATABASE_ERROR + 'Empty database file')
+        with open(self._database_file, "r+") as yml:
+            try:
+                data = yaml.safe_load(yml)
+            except yaml.scanner.ScannerError as _:
+                raise FormatError(self.DATABASE_ERROR + 'Database is not yaml')
             return self._validate(data)
 
     def get_new_id(self) -> int:
@@ -339,6 +333,8 @@ class Database:
         Return a new unused id for a new record.
         :return: int, new unused record id.
         """
+        if not self._id_list:
+            return 1
         return sorted(self._id_list)[-1] + 1
 
     @staticmethod
