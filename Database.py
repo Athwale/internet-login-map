@@ -69,6 +69,7 @@ class Database:
                         self._linkto_check(data, values['linkto'], address)
         else:
             missing_counter += 1
+
         # Check website section
         # Check that website begins with www and contains a dot. Check that each website record has required
         # attributes. Check that password/login is not empty. Check that each linkto/email attribute points
@@ -212,7 +213,7 @@ class Database:
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             # Go through everything looking for the id
-            for section in ['emails', 'websites', 'companies']:
+            for section in data.keys():
                 for record in data[section]:
                     data_dict = record[list(record)[0]]
                     if data_dict['id'] == record_id:
@@ -230,7 +231,7 @@ class Database:
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             # Check main sections
-            for section in ['emails', 'websites', 'companies']:
+            for section in data.keys():
                 for record in data[section]:
                     # Special case empty search string means we want all
                     if not string:
@@ -265,6 +266,9 @@ class Database:
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             if kind in ['emails', 'websites', 'companies']:
+                # Add section if missing from database
+                if kind not in data.keys():
+                    data[kind] = []
                 if new_record in data[kind]:
                     raise FormatError(self.DATABASE_ERROR + 'record already exists in: ' + str(kind))
                 else:
@@ -284,14 +288,14 @@ class Database:
         with open(self._database_file, "r") as yml:
             data = yaml.safe_load(yml)
             # Go through everything looking for the id
-            for section in ['emails', 'websites', 'companies']:
+            for section in data.keys():
                 for record in data[section]:
                     data_dict = record[list(record)[0]]
                     if data_dict['id'] == record_id:
                         record_name = list(record)[0]
                         del data[section][data[section].index(record)]
                         # Find all occurrences of the record name and remove them
-                        for group in ['emails', 'websites', 'companies']:
+                        for group in data.keys():
                             for item in data[group]:
                                 data_dict = item[list(item)[0]]
                                 for kind in ['linkto', 'email']:
