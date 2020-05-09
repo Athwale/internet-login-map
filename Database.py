@@ -371,25 +371,28 @@ class Database:
             data = yaml.safe_load(yml)
             if not data:
                 raise FormatError(self.DATABASE_ERROR + 'Database is empty')
-            for record in data['emails']:
-                node_set.add(list(record)[0])
-            for node in node_set:
-                g.node(node, color=mail_node_color)
+            if self._check_main_section('emails', data):
+                for record in data['emails']:
+                    node_set.add(list(record)[0])
+                for node in node_set:
+                    g.node(node, color=mail_node_color)
 
-            node_set.clear()
-            for record in data['websites']:
-                node_set.add(list(record)[0])
-            for node in node_set:
-                g.node(node, color='black')
+            if self._check_main_section('websites', data):
+                node_set.clear()
+                for record in data['websites']:
+                    node_set.add(list(record)[0])
+                for node in node_set:
+                    g.node(node, color='black')
 
-            node_set.clear()
-            for record in data['companies']:
-                node_set.add(list(record)[0])
-            for node in node_set:
-                g.node(node, color=company_node_color)
+            if self._check_main_section('companies', data):
+                node_set.clear()
+                for record in data['companies']:
+                    node_set.add(list(record)[0])
+                for node in node_set:
+                    g.node(node, color=company_node_color)
 
             # Create edges for emails and linktos
-            for section in ['emails', 'websites', 'companies']:
+            for section in data.keys():
                 for record in data[section]:
                     for link_type in ['email', 'linkto']:
                         try:
