@@ -365,6 +365,8 @@ class Database:
         with open(self._database_file, "r") as yml:
             # Create nodes for all records
             data = yaml.safe_load(yml)
+            if not data:
+                raise FormatError(self.DATABASE_ERROR + 'Database is empty')
             for record in data['emails']:
                 node_set.add(list(record)[0])
             for node in node_set:
